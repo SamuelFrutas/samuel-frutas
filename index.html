@@ -1,0 +1,5531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#2E7D32"
+    >
+
+    <!-- =====================================================
+         FIREBASE
+         Usa o firebase.js atual do projeto.
+         NÃO usa mais Firebase 8 compat.
+    ====================================================== -->
+
+    <script type="module">
+
+        import { db } from "./firebase.js";
+
+        import {
+            collection,
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        window.db = db;
+        window.collection = collection;
+        window.getDocs = getDocs;
+
+    </script>
+
+    <title>Samuel Frutas</title>
+
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f5f7f5;
+
+    color: #263238;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+    padding-bottom: 100px;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+:root {
+
+    --verde: #2e7d32;
+
+    --verde-escuro: #1b5e20;
+
+    --verde-claro: #e8f5e9;
+
+    --branco: #ffffff;
+
+    --fundo: #f5f7f5;
+
+    --texto: #263238;
+
+    --texto-secundario: #607d8b;
+
+    --borda: #e0e5e0;
+
+    --vermelho: #d32f2f;
+
+    --whatsapp: #25d366;
+
+    --sombra:
+        0 3px 12px rgba(0,0,0,.07);
+
+    --sombra-forte:
+        0 8px 25px rgba(0,0,0,.15);
+
+    --raio: 16px;
+}
+
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.container {
+
+    width: 100%;
+
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    padding-left: 14px;
+
+    padding-right: 14px;
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header {
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--verde),
+            var(--verde-escuro)
+        );
+
+    color: white;
+
+    padding:
+        calc(24px + env(safe-area-inset-top))
+        0
+        24px;
+
+    border-radius:
+        0
+        0
+        24px
+        24px;
+
+    box-shadow: var(--sombra);
+
+    margin-bottom: 18px;
+}
+
+.header-content {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+.brand {
+
+    cursor: pointer;
+
+    min-width: 0;
+}
+
+.brand h1 {
+
+    font-size: 1.45rem;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+}
+
+.brand p {
+
+    margin-top: 4px;
+
+    font-size: .78rem;
+
+    opacity: .9;
+}
+
+.header-cart {
+
+    flex-shrink: 0;
+
+    border: none;
+
+    background: rgba(255,255,255,.16);
+
+    color: white;
+
+    border-radius: 12px;
+
+    min-height: 44px;
+
+    padding: 0 13px;
+
+    font-size: .8rem;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   TELAS
+========================================================= */
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+
+/* =========================================================
+   TÍTULOS
+========================================================= */
+
+.page-top {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 16px;
+}
+
+.page-title {
+
+    color: var(--verde);
+
+    font-size: 1.35rem;
+
+    font-weight: 800;
+}
+
+.back-button {
+
+    border: 1px solid var(--borda);
+
+    background: white;
+
+    color: var(--verde);
+
+    border-radius: 10px;
+
+    min-height: 42px;
+
+    padding: 0 13px;
+
+    font-weight: 800;
+
+    font-size: .8rem;
+
+    box-shadow: var(--sombra);
+}
+
+
+/* =========================================================
+   BUSCA
+========================================================= */
+
+.search-box {
+
+    position: relative;
+
+    width: 100%;
+
+    margin-bottom: 18px;
+}
+
+.search-icon {
+
+    position: absolute;
+
+    left: 15px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    font-size: 1.05rem;
+
+    pointer-events: none;
+}
+
+.search-input {
+
+    width: 100%;
+
+    height: 52px;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: 15px;
+
+    background: white;
+
+    padding:
+        0
+        15px
+        0
+        45px;
+
+    outline: none;
+
+    font-size: .92rem;
+
+    color: var(--texto);
+
+    box-shadow: var(--sombra);
+}
+
+.search-input:focus {
+
+    border-color: var(--verde);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(46,125,50,.10);
+}
+
+
+/* =========================================================
+   CATEGORIAS
+========================================================= */
+
+.category-grid {
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.category-card {
+
+    border:
+        1px solid
+        var(--borda);
+
+    background: white;
+
+    border-radius: var(--raio);
+
+    padding: 20px 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    text-align: left;
+
+    box-shadow: var(--sombra);
+
+    transition: transform .15s;
+}
+
+.category-card:active {
+    transform: scale(.98);
+}
+
+.category-icon {
+
+    width: 62px;
+
+    height: 62px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: var(--verde-claro);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 2rem;
+}
+
+.category-info {
+    min-width: 0;
+}
+
+.category-info h2 {
+
+    color: var(--verde);
+
+    font-size: 1.08rem;
+
+    margin-bottom: 3px;
+}
+
+.category-info p {
+
+    color: var(--texto-secundario);
+
+    font-size: .78rem;
+}
+
+
+/* =========================================================
+   RESULTADOS
+========================================================= */
+
+.global-results {
+    display: none;
+}
+
+.global-results.active {
+    display: block;
+}
+
+.result-category {
+    margin-bottom: 20px;
+}
+
+.result-category-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-weight: 800;
+
+    font-size: .9rem;
+
+    margin-bottom: 9px;
+}
+
+
+/* =========================================================
+   PRODUTOS
+========================================================= */
+
+.products-grid {
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+}
+
+.product-card {
+
+    width: 100%;
+
+    background: white;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: var(--raio);
+
+    padding: 14px;
+
+    box-shadow: var(--sombra);
+
+    overflow: hidden;
+}
+
+.product-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 13px;
+
+    min-width: 0;
+}
+
+.product-image {
+
+    width: 62px;
+
+    height: 62px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: var(--verde-claro);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    font-size: 2rem;
+}
+
+.product-image img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.product-name {
+
+    font-size: .95rem;
+
+    font-weight: 800;
+
+    line-height: 1.3;
+
+    word-break: break-word;
+}
+
+.product-category {
+
+    color: var(--texto-secundario);
+
+    font-size: .7rem;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   UNIDADES
+========================================================= */
+
+.unit-label {
+
+    display: block;
+
+    color: var(--texto-secundario);
+
+    font-size: .72rem;
+
+    font-weight: 800;
+
+    margin-bottom: 6px;
+}
+
+.unit-buttons {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(65px, 1fr)
+        );
+
+    gap: 6px;
+
+    margin-bottom: 10px;
+}
+
+.unit-button {
+
+    min-height: 39px;
+
+    border:
+        1.5px solid
+        var(--borda);
+
+    border-radius: 9px;
+
+    background: white;
+
+    color: var(--texto-secundario);
+
+    font-size: .74rem;
+
+    font-weight: 800;
+
+    padding: 0 7px;
+
+    white-space: nowrap;
+}
+
+.unit-button.active {
+
+    color: white;
+
+    background: var(--verde);
+
+    border-color: var(--verde);
+}
+
+.fixed-unit {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 34px;
+
+    padding: 0 10px;
+
+    border-radius: 20px;
+
+    background: var(--verde-claro);
+
+    color: var(--verde);
+
+    font-size: .72rem;
+
+    font-weight: 800;
+
+    margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   QUANTIDADE
+========================================================= */
+
+.quantity-row {
+
+    display: grid;
+
+    grid-template-columns:
+        43px
+        minmax(0,1fr)
+        43px;
+
+    align-items: center;
+
+    gap: 7px;
+
+    background: #f5f7f5;
+
+    border-radius: 12px;
+
+    padding: 6px;
+}
+
+.quantity-button {
+
+    width: 43px;
+
+    height: 43px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: white;
+
+    color: var(--verde);
+
+    font-size: 1.35rem;
+
+    font-weight: 800;
+
+    box-shadow:
+        0 1px 4px rgba(0,0,0,.07);
+}
+
+.quantity-button:active {
+    transform: scale(.94);
+}
+
+.quantity-center {
+
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 5px;
+}
+
+.quantity-input {
+
+    width: 100%;
+
+    min-width: 0;
+
+    height: 43px;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: 10px;
+
+    background: white;
+
+    text-align: center;
+
+    font-size: .95rem;
+
+    font-weight: 800;
+
+    outline: none;
+}
+
+.quantity-unit {
+
+    flex-shrink: 0;
+
+    color: var(--texto-secundario);
+
+    font-size: .7rem;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   BOTÃO PRINCIPAL
+========================================================= */
+
+.primary-button {
+
+    width: 100%;
+
+    min-height: 52px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: var(--verde);
+
+    color: white;
+
+    font-size: .92rem;
+
+    font-weight: 800;
+
+    box-shadow: var(--sombra);
+}
+
+
+/* =========================================================
+   SACOLA
+========================================================= */
+
+.cart-list {
+
+    background: white;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: var(--raio);
+
+    padding: 0 14px;
+
+    margin-bottom: 15px;
+
+    box-shadow: var(--sombra);
+}
+
+.cart-empty {
+
+    text-align: center;
+
+    color: var(--texto-secundario);
+
+    font-size: .85rem;
+
+    padding: 28px 10px;
+}
+
+.cart-item {
+
+    padding: 17px 0;
+
+    border-bottom:
+        1px solid
+        var(--borda);
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item-main {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+}
+
+.cart-item-left {
+
+    flex: 1;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   LINHA DO NOME + QUANTIDADE
+========================================================= */
+
+.cart-item-title-row {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    min-width: 0;
+}
+
+.cart-item-name {
+
+    font-size: .92rem;
+
+    font-weight: 800;
+
+    word-break: break-word;
+
+    flex: 1;
+}
+
+
+/* =========================================================
+   QUANTIDADE CLICÁVEL
+========================================================= */
+
+.cart-quantity-edit {
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+    padding: 2px 0;
+
+    -webkit-tap-highlight-color:
+        transparent;
+}
+
+.cart-item-quantity {
+
+    white-space: nowrap;
+
+    font-size: .82rem;
+
+    font-weight: 800;
+
+    color: var(--verde);
+}
+
+.cart-quantity-hint {
+
+    margin-top: 3px;
+
+    color: #9aa5a0;
+
+    font-size: .61rem;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   LIXEIRA — ORIGINAL
+========================================================= */
+
+.remove-item-button {
+
+    flex-shrink: 0;
+
+    width: 36px;
+
+    height: 36px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #fff1f1;
+
+    color: #e53935;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition:
+        background .2s ease,
+        transform .15s ease,
+        color .2s ease;
+
+    box-shadow:
+        0 2px 6px
+        rgba(229, 57, 53, 0.12);
+}
+
+.remove-item-button:hover {
+
+    background: #ffe0e0;
+
+    color: #c62828;
+}
+
+.remove-item-button:active {
+
+    transform: scale(.88);
+
+    background: #ffd5d5;
+}
+
+.remove-item-button svg {
+
+    width: 18px;
+
+    height: 18px;
+
+    stroke: currentColor;
+
+    stroke-width: 2;
+
+    fill: none;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+
+/* =========================================================
+   OBSERVAÇÃO
+========================================================= */
+
+.observation-area {
+    margin-top: 8px;
+}
+
+.observation-toggle-button {
+
+    border: none;
+
+    background: transparent;
+
+    color: var(--verde);
+
+    font-size: .74rem;
+
+    font-weight: 800;
+
+    padding: 5px 0;
+}
+
+.observation-editor {
+
+    display: none;
+
+    margin-top: 7px;
+}
+
+.observation-editor.show {
+    display: block;
+}
+
+.item-observation {
+
+    width: 100%;
+
+    min-height: 82px;
+
+    resize: vertical;
+
+    border:
+        1px solid
+        #dfe6df;
+
+    border-radius: 14px;
+
+    background: #f8faf8;
+
+    padding: 13px 14px;
+
+    font-size: .82rem;
+
+    line-height: 1.45;
+
+    color: #263238;
+
+    outline: none;
+
+    box-shadow:
+        inset
+        0
+        1px
+        2px
+        rgba(0,0,0,.03);
+
+    transition:
+        border-color .2s ease,
+        background .2s ease,
+        box-shadow .2s ease;
+}
+
+.item-observation::placeholder {
+    color: #9aa5a0;
+}
+
+.item-observation:focus {
+
+    border-color: var(--verde);
+
+    background: white;
+
+    box-shadow:
+        0
+        0
+        0
+        3px
+        rgba(46,125,50,.08);
+}
+
+.save-observation-button {
+
+    margin-top: 7px;
+
+    min-height: 38px;
+
+    padding: 0 13px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: var(--verde);
+
+    color: white;
+
+    font-size: .72rem;
+
+    font-weight: 800;
+
+    box-shadow:
+        0 2px 6px
+        rgba(46,125,50,.18);
+}
+
+
+/* =========================================================
+   JANELA FLUTUANTE — ALTERAR QUANTIDADE E UNIDADE
+========================================================= */
+
+.edit-quantity-modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 5000;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 18px;
+}
+
+.edit-quantity-modal.show {
+    display: flex;
+}
+
+.edit-quantity-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(0,0,0,.38);
+}
+
+.edit-quantity-box {
+
+    position: relative;
+
+    width: 100%;
+
+    max-width: 380px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 15px 45px
+        rgba(0,0,0,.20);
+
+    animation:
+        editQuantityOpen
+        .18s ease;
+}
+
+@keyframes editQuantityOpen {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            scale(.95);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            scale(1);
+
+    }
+
+}
+
+.edit-quantity-header {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 16px;
+}
+
+.edit-quantity-label {
+
+    display: block;
+
+    color: #8a9690;
+
+    font-size: .68rem;
+
+    font-weight: 700;
+}
+
+.edit-quantity-header h3 {
+
+    margin-top: 4px;
+
+    color: var(--texto);
+
+    font-size: 1.08rem;
+
+    font-weight: 800;
+}
+
+.edit-quantity-close {
+
+    width: 34px;
+
+    height: 34px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #f1f4f1;
+
+    color: #607d8b;
+
+    font-size: 1.35rem;
+
+    line-height: 1;
+}
+
+/* =========================================================
+   SELETOR DE UNIDADE NA JANELA
+========================================================= */
+
+.edit-unit-wrapper {
+    margin-bottom: 14px;
+}
+
+.edit-unit-label {
+    display: block;
+    color: var(--texto-secundario);
+    font-size: .72rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.edit-unit-select {
+    width: 100%;
+    height: 45px;
+    border: 1px solid var(--borda);
+    border-radius: 11px;
+    background: #f5f7f5;
+    padding: 0 12px;
+    font-size: .9rem;
+    font-weight: 800;
+    color: var(--texto);
+    outline: none;
+}
+
+
+/* =========================================================
+   CONTROLE DA QUANTIDADE NA JANELA
+========================================================= */
+
+.edit-quantity-control {
+
+    display: grid;
+
+    grid-template-columns:
+        48px
+        minmax(0,1fr)
+        48px;
+
+    align-items: center;
+
+    gap: 9px;
+
+    background: #f5f7f5;
+
+    border-radius: 14px;
+
+    padding: 8px;
+
+    margin-bottom: 15px;
+}
+
+.edit-quantity-control > button {
+
+    width: 48px;
+
+    height: 48px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background: white;
+
+    color: var(--verde);
+
+    font-size: 1.45rem;
+
+    font-weight: 800;
+
+    box-shadow:
+        0 1px 4px
+        rgba(0,0,0,.06);
+}
+
+.edit-quantity-center {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 5px;
+}
+
+.edit-quantity-center input {
+
+    width: 75px;
+
+    height: 48px;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: 11px;
+
+    background: white;
+
+    text-align: center;
+
+    font-size: 1rem;
+
+    font-weight: 800;
+
+    outline: none;
+}
+
+.edit-quantity-center span {
+
+    color: var(--texto-secundario);
+
+    font-size: .72rem;
+
+    font-weight: 800;
+}
+
+.edit-quantity-save {
+
+    width: 100%;
+
+    min-height: 48px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: var(--verde);
+
+    color: white;
+
+    font-size: .85rem;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   ENTREGA
+========================================================= */
+
+.section-box {
+
+    background: white;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: var(--raio);
+
+    padding: 16px;
+
+    margin-bottom: 15px;
+
+    box-shadow: var(--sombra);
+}
+
+.section-box-title {
+
+    color: var(--verde);
+
+    font-size: .92rem;
+
+    font-weight: 800;
+
+    margin-bottom: 11px;
+}
+
+.delivery-options {
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 8px;
+}
+
+.delivery-option {
+
+    width: 100%;
+
+    border:
+        1.5px solid
+        var(--borda);
+
+    border-radius: 11px;
+
+    background: white;
+
+    padding: 12px;
+
+    text-align: left;
+}
+
+.delivery-option.active {
+
+    border-color: var(--verde);
+
+    background: var(--verde-claro);
+}
+
+.delivery-option strong {
+
+    display: block;
+
+    color: var(--texto);
+
+    font-size: .8rem;
+}
+
+.delivery-option.active strong {
+    color: var(--verde);
+}
+
+.delivery-option span {
+
+    display: block;
+
+    color: var(--texto-secundario);
+
+    font-size: .72rem;
+
+    margin-top: 3px;
+}
+
+.date-wrapper {
+
+    display: none;
+
+    margin-top: 9px;
+}
+
+.date-wrapper.show {
+    display: block;
+}
+
+.date-input {
+
+    width: 100%;
+
+    height: 45px;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: 10px;
+
+    padding: 0 10px;
+
+    outline: none;
+
+    background: white;
+
+    font-size: .85rem;
+}
+
+
+/* =========================================================
+   OBSERVAÇÃO GERAL
+========================================================= */
+
+.general-label {
+
+    display: block;
+
+    font-size: .82rem;
+
+    font-weight: 800;
+
+    margin-bottom: 7px;
+}
+
+.general-textarea {
+
+    width: 100%;
+
+    min-height: 90px;
+
+    resize: vertical;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: 10px;
+
+    padding: 11px;
+
+    outline: none;
+
+    font-size: .8rem;
+}
+
+
+/* =========================================================
+   WHATSAPP
+========================================================= */
+
+.whatsapp-button {
+
+    width: 100%;
+
+    min-height: 54px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: var(--whatsapp);
+
+    color: white;
+
+    font-size: .92rem;
+
+    font-weight: 800;
+
+    box-shadow: var(--sombra-forte);
+}
+
+
+/* =========================================================
+   PEDIDO ANTERIOR
+========================================================= */
+
+.repeat-card {
+
+    display: none;
+
+    background: white;
+
+    border:
+        1.5px dashed
+        var(--verde);
+
+    border-radius: var(--raio);
+
+    padding: 14px;
+
+    margin-bottom: 17px;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.repeat-card.show {
+    display: flex;
+}
+
+.repeat-title {
+
+    color: var(--texto-secundario);
+
+    font-size: .68rem;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+.repeat-text {
+
+    color: var(--verde);
+
+    font-size: .8rem;
+
+    font-weight: 800;
+
+    margin-top: 3px;
+}
+
+.repeat-button {
+
+    flex-shrink: 0;
+
+    border: none;
+
+    background: var(--verde);
+
+    color: white;
+
+    border-radius: 9px;
+
+    min-height: 38px;
+
+    padding: 0 10px;
+
+    font-size: .7rem;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   SEM RESULTADOS
+========================================================= */
+
+.no-results {
+
+    background: white;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: var(--raio);
+
+    padding: 25px 15px;
+
+    text-align: center;
+
+    color: var(--texto-secundario);
+
+    font-size: .82rem;
+}
+
+
+/* =========================================================
+   GOOGLE
+========================================================= */
+
+.google-card {
+
+    margin-top: 18px;
+
+    background: white;
+
+    border:
+        1px solid
+        var(--borda);
+
+    border-radius: var(--raio);
+
+    padding: 17px;
+
+    text-align: center;
+
+    box-shadow: var(--sombra);
+}
+
+.google-card strong {
+
+    display: block;
+
+    color: var(--verde);
+
+    font-size: .88rem;
+}
+
+.google-card p {
+
+    color: var(--texto-secundario);
+
+    font-size: .72rem;
+
+    margin: 5px 0 11px;
+}
+
+.google-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 40px;
+
+    padding: 0 14px;
+
+    border-radius: 9px;
+
+    background: #4285f4;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: .75rem;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   SACOLA FLUTUANTE
+========================================================= */
+
+.floating-cart {
+
+    position: fixed;
+
+    z-index: 1000;
+
+    left: 12px;
+
+    right: 12px;
+
+    bottom:
+        calc(
+            12px +
+            env(safe-area-inset-bottom)
+        );
+
+    min-height: 57px;
+
+    background: var(--verde);
+
+    color: white;
+
+    border-radius: 15px;
+
+    box-shadow: var(--sombra-forte);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        8px
+        10px
+        8px
+        15px;
+
+    transform: translateY(160%);
+
+    transition: transform .25s;
+}
+
+.floating-cart.show {
+    transform: translateY(0);
+}
+
+.floating-cart-info {
+
+    font-size: .8rem;
+
+    font-weight: 800;
+}
+
+.floating-cart-button {
+
+    border: none;
+
+    background: white;
+
+    color: var(--verde);
+
+    border-radius: 9px;
+
+    min-height: 39px;
+
+    padding: 0 12px;
+
+    font-size: .72rem;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (min-width: 600px) {
+
+    .container {
+
+        padding-left: 20px;
+
+        padding-right: 20px;
+    }
+
+    .category-grid {
+
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+    .category-card {
+
+        display: block;
+
+        text-align: center;
+
+        padding: 22px 12px;
+    }
+
+    .category-icon {
+
+        margin: 0 auto 10px;
+    }
+
+    .products-grid {
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+    }
+
+    .delivery-options {
+
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .floating-cart {
+
+        left: 50%;
+
+        right: auto;
+
+        width: 430px;
+
+        max-width:
+            calc(100% - 30px);
+
+        transform:
+            translate(-50%,160%);
+    }
+
+    .floating-cart.show {
+
+        transform:
+            translate(-50%,0);
+    }
+
+}
+
+
+/* =========================================================
+   COMPUTADOR
+========================================================= */
+
+@media (min-width: 900px) {
+
+    .products-grid {
+
+        grid-template-columns:
+            repeat(3,minmax(0,1fr));
+    }
+
+    .category-card {
+
+        padding: 25px 15px;
+    }
+
+    .category-icon {
+
+        width: 72px;
+
+        height: 72px;
+
+        font-size: 2.4rem;
+    }
+
+    #view-cart {
+
+        max-width: 700px;
+
+        margin: 0 auto;
+    }
+
+}
+
+
+/* =========================================================
+   COMPUTADOR GRANDE
+========================================================= */
+
+@media (min-width: 1200px) {
+
+    .products-grid {
+
+        grid-template-columns:
+            repeat(4,minmax(0,1fr));
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="header">
+
+    <div class="container">
+
+        <div class="header-content">
+
+            <div
+                class="brand"
+                onclick="showView('home')"
+            >
+
+                <h1>
+                    Samuel Frutas
+                </h1>
+
+                <p>
+                    Monte seu pedido de forma simples
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                class="header-cart"
+                onclick="openCart()"
+            >
+
+                🛒
+
+                <span id="header-cart-count">
+                    0
+                </span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     CONTEÚDO
+========================================================= -->
+
+<main class="container">
+
+
+<!-- =========================================================
+     HOME
+========================================================= -->
+
+<section
+    id="view-home"
+    class="view active"
+>
+
+    <div
+        id="repeat-card"
+        class="repeat-card"
+    >
+
+        <div>
+
+            <div class="repeat-title">
+                Pedido anterior
+            </div>
+
+            <div class="repeat-text">
+                🔄 Deseja repetir seu último pedido?
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="repeat-button"
+            onclick="repeatLastOrder()"
+        >
+            Repetir
+        </button>
+
+    </div>
+
+
+    <div class="search-box">
+
+        <span class="search-icon">
+            🔎
+        </span>
+
+        <input
+            id="global-search"
+            class="search-input"
+            type="search"
+            autocomplete="off"
+            placeholder="Pesquisar fruta, legume ou verdura..."
+            oninput="searchAll(this.value)"
+        >
+
+    </div>
+
+
+    <div
+        id="global-results"
+        class="global-results"
+    ></div>
+
+
+    <div
+        id="category-menu"
+        class="category-grid"
+    >
+
+        <button
+            type="button"
+            class="category-card"
+            onclick="showView('frutas')"
+        >
+
+            <div class="category-icon">
+                🍎
+            </div>
+
+            <div class="category-info">
+
+                <h2>
+                    Frutas
+                </h2>
+
+                <p>
+                    Escolha suas frutas
+                </p>
+
+            </div>
+
+        </button>
+
+
+        <button
+            type="button"
+            class="category-card"
+            onclick="showView('legumes')"
+        >
+
+            <div class="category-icon">
+                🥕
+            </div>
+
+            <div class="category-info">
+
+                <h2>
+                    Legumes
+                </h2>
+
+                <p>
+                    Escolha a unidade desejada
+                </p>
+
+            </div>
+
+        </button>
+
+
+        <button
+            type="button"
+            class="category-card"
+            onclick="showView('verduras')"
+        >
+
+            <div class="category-icon">
+                🥬
+            </div>
+
+            <div class="category-info">
+
+                <h2>
+                    Verduras
+                </h2>
+
+                <p>
+                    Fresquinhas e selecionadas
+                </p>
+
+            </div>
+
+        </button>
+
+    </div>
+
+
+    <button
+        type="button"
+        class="primary-button"
+        onclick="openCart()"
+    >
+
+        🛒 Finalizar pedido
+
+    </button>
+
+
+    <div class="google-card">
+
+        <strong>
+            📍 Samuel Frutas
+        </strong>
+
+        <p>
+            Gostou do nosso atendimento?
+            Avalie a gente no Google.
+        </p>
+
+        <a
+            class="google-button"
+            href="https://maps.app.goo.gl/JSYmcN9iaFvnKME99"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            ⭐ Avaliar no Google
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FRUTAS
+========================================================= -->
+
+<section
+    id="view-frutas"
+    class="view"
+>
+
+    <div class="page-top">
+
+        <button
+            type="button"
+            class="back-button"
+            onclick="showView('home')"
+        >
+            ← Voltar
+        </button>
+
+        <h2 class="page-title">
+            🍎 Frutas
+        </h2>
+
+    </div>
+
+
+    <div class="search-box">
+
+        <span class="search-icon">
+            🔎
+        </span>
+
+        <input
+            id="search-frutas"
+            class="search-input"
+            type="search"
+            autocomplete="off"
+            placeholder="Pesquisar fruta..."
+            oninput="renderCategory('frutas', this.value)"
+        >
+
+    </div>
+
+
+    <div
+        id="products-frutas"
+        class="products-grid"
+    ></div>
+
+</section>
+
+
+<!-- =========================================================
+     LEGUMES
+========================================================= -->
+
+<section
+    id="view-legumes"
+    class="view"
+>
+
+    <div class="page-top">
+
+        <button
+            type="button"
+            class="back-button"
+            onclick="showView('home')"
+        >
+            ← Voltar
+        </button>
+
+        <h2 class="page-title">
+            🥕 Legumes
+        </h2>
+
+    </div>
+
+
+    <div class="search-box">
+
+        <span class="search-icon">
+            🔎
+        </span>
+
+        <input
+            id="search-legumes"
+            class="search-input"
+            type="search"
+            autocomplete="off"
+            placeholder="Pesquisar legume..."
+            oninput="renderCategory('legumes', this.value)"
+        >
+
+    </div>
+
+
+    <div
+        id="products-legumes"
+        class="products-grid"
+    ></div>
+
+</section>
+
+
+<!-- =========================================================
+     VERDURAS
+========================================================= -->
+
+<section
+    id="view-verduras"
+    class="view"
+>
+
+    <div class="page-top">
+
+        <button
+            type="button"
+            class="back-button"
+            onclick="showView('home')"
+        >
+            ← Voltar
+        </button>
+
+        <h2 class="page-title">
+            🥬 Verduras
+        </h2>
+
+    </div>
+
+
+    <div class="search-box">
+
+        <span class="search-icon">
+            🔎
+        </span>
+
+        <input
+            id="search-verduras"
+            class="search-input"
+            type="search"
+            autocomplete="off"
+            placeholder="Pesquisar verdura..."
+            oninput="renderCategory('verduras', this.value)"
+        >
+
+    </div>
+
+
+    <div
+        id="products-verduras"
+        class="products-grid"
+    ></div>
+
+</section>
+
+
+<!-- =========================================================
+     SACOLA
+========================================================= -->
+
+<section
+    id="view-cart"
+    class="view"
+>
+
+    <div class="page-top">
+
+        <button
+            type="button"
+            class="back-button"
+            onclick="showView('home')"
+        >
+            ← Início
+        </button>
+
+        <h2 class="page-title">
+            🛒 Sacola
+        </h2>
+
+    </div>
+
+
+    <div
+        id="cart-list"
+        class="cart-list"
+    ></div>
+
+
+    <div class="section-box">
+
+        <div class="section-box-title">
+            📅 Quando deseja receber?
+        </div>
+
+
+        <div class="delivery-options">
+
+            <button
+                type="button"
+                id="delivery-next"
+                class="delivery-option active"
+                onclick="chooseNextDelivery()"
+            >
+
+                <strong>
+                    🚚 Próxima entrega disponível
+                </strong>
+
+                <span id="next-delivery-text"></span>
+
+            </button>
+
+
+            <button
+                type="button"
+                id="delivery-custom"
+                class="delivery-option"
+                onclick="chooseCustomDelivery()"
+            >
+
+                <strong>
+                    📅 Escolher outra data
+                </strong>
+
+                <span>
+                    Selecione o dia desejado
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="date-wrapper"
+            class="date-wrapper"
+        >
+
+            <input
+                id="delivery-date"
+                class="date-input"
+                type="date"
+                onchange="changeCustomDate()"
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="section-box">
+
+        <label
+            class="general-label"
+            for="general-observation"
+        >
+            📝 Observação geral do pedido
+        </label>
+
+        <textarea
+            id="general-observation"
+            class="general-textarea"
+            placeholder="Alguma observação sobre o pedido?"
+        ></textarea>
+
+    </div>
+
+
+    <button
+        type="button"
+        class="whatsapp-button"
+        onclick="sendWhatsApp()"
+    >
+
+        📱 Enviar pedido pelo WhatsApp
+
+    </button>
+
+</section>
+
+</main>
+
+
+<!-- =========================================================
+     SACOLA FLUTUANTE
+========================================================= -->
+
+<div
+    id="floating-cart"
+    class="floating-cart"
+>
+
+    <div class="floating-cart-info">
+
+        🛒
+
+        <span id="floating-cart-count">
+            0 itens
+        </span>
+
+    </div>
+
+
+    <button
+        type="button"
+        class="floating-cart-button"
+        onclick="openCart()"
+    >
+        Ver sacola →
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     JANELA FLUTUANTE
+     ALTERAR QUANTIDADE E UNIDADE
+========================================================= -->
+
+<div
+    id="edit-quantity-modal"
+    class="edit-quantity-modal"
+>
+
+    <div
+        class="edit-quantity-overlay"
+        onclick="closeEditQuantity()"
+    ></div>
+
+
+    <div class="edit-quantity-box">
+
+        <div class="edit-quantity-header">
+
+            <div>
+
+                <span class="edit-quantity-label">
+                    Alterar quantidade e unidade
+                </span>
+
+                <h3
+                    id="edit-quantity-product-name"
+                >
+                    Produto
+                </h3>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="edit-quantity-close"
+                onclick="closeEditQuantity()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- =========================================================
+             NOVO: SELETOR DE UNIDADES DISPONÍVEIS NA JANELA
+        ========================================================= -->
+        <div class="edit-unit-wrapper">
+
+            <label class="edit-unit-label" for="edit-unit-select">
+                UNIDADE DE MEDIDA:
+            </label>
+
+            <select
+                id="edit-unit-select"
+                class="edit-unit-select"
+                onchange="changeModalUnit(this.value)"
+            >
+            </select>
+
+        </div>
+
+
+        <div class="edit-quantity-control">
+
+            <button
+                type="button"
+                onclick="changeEditQuantity(-1)"
+            >
+                −
+            </button>
+
+
+            <div class="edit-quantity-center">
+
+                <input
+                    id="edit-quantity-input"
+                    type="number"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                >
+
+                <span
+                    id="edit-quantity-unit"
+                >
+                    UN
+                </span>
+
+            </div>
+
+
+            <button
+                type="button"
+                onclick="changeEditQuantity(1)"
+            >
+                +
+            </button>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="edit-quantity-save"
+            onclick="saveEditedQuantity()"
+        >
+            Salvar alteração
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CONFIGURAÇÕES
+========================================================= */
+
+const WHATSAPP_NUMBER =
+    "5521972837869";
+
+const LAST_ORDER_KEY =
+    "samuel_frutas_ultimo_pedido";
+
+
+/* =========================================================
+   PRODUTOS
+========================================================= */
+
+let products = {
+
+    frutas: [],
+
+    legumes: [],
+
+    verduras: []
+
+};
+
+
+/* =========================================================
+   ESTADO
+========================================================= */
+
+let cart = {};
+
+let selectedDeliveryDate = "";
+
+let currentView = "home";
+
+const selectedUnits = {};
+
+
+/* =========================================================
+   ESTADO DA JANELA DE EDIÇÃO
+========================================================= */
+
+let editingCartKey = "";
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadProductsFromFirebase();
+
+        checkLastOrder();
+
+        setupDefaultDeliveryDate();
+
+        updateCartUI();
+
+    }
+);
+
+
+/* =========================================================
+   CARREGAR PRODUTOS DO FIREBASE
+========================================================= */
+
+async function loadProductsFromFirebase() {
+
+    try {
+
+        const snapshot =
+            await window.getDocs(
+                window.collection(
+                    window.db,
+                    "produtos"
+                )
+            );
+
+
+        products = {
+
+            frutas: [],
+
+            legumes: [],
+
+            verduras: []
+
+        };
+
+
+        snapshot.forEach(
+            docSnap => {
+
+                const data =
+                    docSnap.data();
+
+
+                const isAtivo =
+                    data.ativo !== undefined
+                        ? data.ativo
+                        : (
+                            data.active !== undefined
+                                ? data.active
+                                : true
+                        );
+
+
+                if (!isAtivo) {
+                    return;
+                }
+
+
+                const categoryKey =
+                    normalizarCategoria(
+                        data.categoria ||
+                        data.category ||
+                        "frutas"
+                    );
+
+
+                const rawImg =
+                    data.imagemUrl ||
+                    data.imagem ||
+                    data.imageUrl ||
+                    data.foto ||
+                    data.image ||
+                    data.icon ||
+                    data.url ||
+                    data.img ||
+                    "";
+
+
+                const availableUnits =
+                    parseUnits(data);
+
+
+                const formattedProduct = {
+
+                    id:
+                        docSnap.id,
+
+                    name:
+                        data.nome ||
+                        data.name ||
+                        "Produto",
+
+                    icon:
+                        rawImg,
+
+                    units:
+                        availableUnits
+
+                };
+
+
+                if (
+                    products[categoryKey]
+                ) {
+
+                    products[categoryKey]
+                        .push(
+                            formattedProduct
+                        );
+
+                } else {
+
+                    products.frutas.push(
+                        formattedProduct
+                    );
+
+                }
+
+            }
+        );
+
+
+        Object.keys(products).forEach(
+            category => {
+
+                products[category].sort(
+                    (a, b) =>
+                        a.name.localeCompare(
+                            b.name,
+                            "pt-BR"
+                        )
+                );
+
+            }
+        );
+
+
+        initDefaultUnits();
+
+        renderAllCategories();
+
+
+    } catch (error) {
+
+        console.error(
+            "Erro ao carregar produtos do Firebase:",
+            error
+        );
+
+        mostrarErroCarregamento();
+
+    }
+
+}
+
+
+/* =========================================================
+   ERRO DE CARREGAMENTO
+========================================================= */
+
+function mostrarErroCarregamento() {
+
+    Object.keys(products).forEach(
+        category => {
+
+            const container =
+                document.getElementById(
+                    `products-${category}`
+                );
+
+
+            if (container) {
+
+                container.innerHTML = `
+
+                    <div class="no-results">
+
+                        Não foi possível carregar os produtos.
+
+                        <br><br>
+
+                        Atualize a página e tente novamente.
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   NORMALIZAR CATEGORIA
+========================================================= */
+
+function normalizarCategoria(categoria) {
+
+    const value =
+        String(categoria)
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(
+                /[\u0300-\u036f]/g,
+                ""
+            );
+
+
+    if (
+        value === "legume" ||
+        value === "legumes"
+    ) {
+
+        return "legumes";
+
+    }
+
+
+    if (
+        value === "verdura" ||
+        value === "verduras"
+    ) {
+
+        return "verduras";
+
+    }
+
+
+    return "frutas";
+
+}
+
+
+/* =========================================================
+   CONVERTER UNIDADES
+========================================================= */
+
+function parseUnits(data) {
+
+    if (
+        data.unidadesMedida &&
+        typeof data.unidadesMedida === "object"
+    ) {
+
+        const u =
+            data.unidadesMedida;
+
+
+        const units = [];
+
+
+        if (
+            u.unidade === true
+        ) {
+
+            units.push("UN");
+
+        }
+
+
+        if (
+            u.quilo === true
+        ) {
+
+            units.push("KG");
+
+        }
+
+
+        if (
+            u.maco === true
+        ) {
+
+            units.push("MAÇO");
+
+        }
+
+
+        if (
+            u.duzia === true
+        ) {
+
+            units.push("DÚZIA");
+
+        }
+
+
+        if (
+            u.lote === true
+        ) {
+
+            const quantidade =
+                parseInt(
+                    u.quantidadePorLote,
+                    10
+                );
+
+
+            if (
+                quantidade &&
+                quantidade > 0
+            ) {
+
+                units.push(
+                    `LOTE C/${quantidade}`
+                );
+
+            } else {
+
+                units.push(
+                    "LOTE"
+                );
+
+            }
+
+        }
+
+
+        if (
+            units.length > 0
+        ) {
+
+            return units;
+
+        }
+
+    }
+
+
+    const unidadesObj =
+        data.unidades ||
+        data.units;
+
+
+    const qtdLote =
+        data.quantidadeLote ||
+        data.loteQuantity ||
+        data.lote_quantidade ||
+        3;
+
+
+    const unitsList = [];
+
+
+    if (
+        Array.isArray(unidadesObj)
+    ) {
+
+        return unidadesObj.map(u => {
+
+            const su =
+                String(u)
+                    .toUpperCase();
+
+
+            if (
+                su.includes("LOTE")
+            ) {
+
+                return `LOTE C/${qtdLote}`;
+
+            }
+
+
+            return normalizarUnidadeAntiga(
+                su
+            );
+
+        });
+
+    }
+
+
+    if (
+        unidadesObj &&
+        typeof unidadesObj === "object"
+    ) {
+
+        Object.keys(unidadesObj)
+            .forEach(key => {
+
+                const val =
+                    unidadesObj[key];
+
+
+                if (
+                    val === true ||
+                    val === "true" ||
+                    (
+                        typeof val === "number" &&
+                        val > 0
+                    )
+                ) {
+
+                    const lKey =
+                        normalizarTexto(key);
+
+
+                    if (
+                        lKey === "un" ||
+                        lKey.includes("unidade")
+                    ) {
+
+                        unitsList.push("UN");
+
+                    } else if (
+                        lKey === "kg" ||
+                        lKey.includes("quilo")
+                    ) {
+
+                        unitsList.push("KG");
+
+                    } else if (
+                        lKey.includes("maco")
+                    ) {
+
+                        unitsList.push("MAÇO");
+
+                    } else if (
+                        lKey.includes("duzia")
+                    ) {
+
+                        unitsList.push("DÚZIA");
+
+                    } else if (
+                        lKey.includes("lote")
+                    ) {
+
+                        unitsList.push(
+                            `LOTE C/${qtdLote}`
+                        );
+
+                    } else {
+
+                        unitsList.push(
+                            String(key).toUpperCase()
+                        );
+
+                    }
+
+                }
+
+            });
+
+    }
+
+
+    if (
+        unitsList.length === 0
+    ) {
+
+        if (
+            data.un === true ||
+            data.unidade === true
+        ) {
+
+            unitsList.push("UN");
+
+        }
+
+
+        if (
+            data.kg === true ||
+            data.quilo === true
+        ) {
+
+            unitsList.push("KG");
+
+        }
+
+
+        if (
+            data.maco === true ||
+            data.maço === true
+        ) {
+
+            unitsList.push("MAÇO");
+
+        }
+
+
+        if (
+            data.duzia === true ||
+            data.dúzia === true
+        ) {
+
+            unitsList.push("DÚZIA");
+
+        }
+
+
+        if (
+            data.lote === true
+        ) {
+
+            unitsList.push(
+                `LOTE C/${qtdLote}`
+            );
+
+        }
+
+    }
+
+
+    return unitsList.length > 0
+        ? [...new Set(unitsList)]
+        : ["UN"];
+
+}
+
+
+/* =========================================================
+   NORMALIZAR TEXTO
+========================================================= */
+
+function normalizarTexto(value) {
+
+    return String(value)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .trim();
+
+}
+
+
+/* =========================================================
+   NORMALIZAR UNIDADE ANTIGA
+========================================================= */
+
+function normalizarUnidadeAntiga(value) {
+
+    const v =
+        normalizarTexto(value);
+
+
+    if (
+        v === "un" ||
+        v.includes("unidade")
+    ) {
+
+        return "UN";
+
+    }
+
+
+    if (
+        v === "kg" ||
+        v.includes("quilo")
+    ) {
+
+        return "KG";
+
+    }
+
+
+    if (
+        v.includes("maco")
+    ) {
+
+        return "MAÇO";
+
+    }
+
+
+    if (
+        v.includes("duzia")
+    ) {
+
+        return "DÚZIA";
+
+    }
+
+
+    return String(value).toUpperCase();
+
+}
+
+
+/* =========================================================
+   UNIDADES PADRÃO
+========================================================= */
+
+function initDefaultUnits() {
+
+    Object.keys(products)
+        .forEach(category => {
+
+            products[category]
+                .forEach(product => {
+
+                    if (
+                        product.units &&
+                        product.units.length > 0
+                    ) {
+
+                        const atual =
+                            selectedUnits[
+                                product.id
+                            ];
+
+
+                        if (
+                            atual &&
+                            product.units.includes(
+                                atual
+                            )
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        selectedUnits[
+                            product.id
+                        ] =
+                            product.units[0];
+
+                    }
+
+                });
+
+        });
+
+}
+
+
+/* =========================================================
+   NAVEGAÇÃO
+========================================================= */
+
+function showView(viewId) {
+
+    document
+        .querySelectorAll(".view")
+        .forEach(v =>
+            v.classList.remove("active")
+        );
+
+
+    const target =
+        document.getElementById(
+            `view-${viewId}`
+        );
+
+
+    if (target) {
+
+        target.classList.add("active");
+
+        currentView = viewId;
+
+    }
+
+
+    window.scrollTo({
+
+        top: 0,
+
+        behavior: "smooth"
+
+    });
+
+}
+
+
+function openCart() {
+
+    renderCart();
+
+    showView("cart");
+
+}
+
+
+/* =========================================================
+   RENDERIZAÇÃO
+========================================================= */
+
+function renderAllCategories() {
+
+    renderCategory("frutas");
+
+    renderCategory("legumes");
+
+    renderCategory("verduras");
+
+}
+
+
+function renderCategory(
+    category,
+    filterText = ""
+) {
+
+    const container =
+        document.getElementById(
+            `products-${category}`
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const query =
+        String(filterText)
+            .trim()
+            .toLowerCase();
+
+
+    const list =
+        (products[category] || [])
+            .filter(product =>
+                product.name
+                    .toLowerCase()
+                    .includes(query)
+            );
+
+
+    if (
+        list.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="no-results">
+
+                Nenhum item encontrado.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        list
+            .map(product =>
+                buildProductCard(
+                    product,
+                    category
+                )
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   CARD DO PRODUTO
+========================================================= */
+
+function buildProductCard(
+    product,
+    category
+) {
+
+    const currentUnit =
+        selectedUnits[product.id] ||
+        (
+            product.units &&
+            product.units[0]
+        ) ||
+        "UN";
+
+
+    const cartKey =
+        makeCartKey(
+            product.id,
+            currentUnit
+        );
+
+
+    const qty =
+        cart[cartKey]
+            ? cart[cartKey].quantity
+            : 0;
+
+
+    let imageHTML = "";
+
+
+    if (
+        product.icon &&
+        typeof product.icon === "string"
+    ) {
+
+        const img =
+            product.icon.trim();
+
+
+        if (
+            img.startsWith("http://") ||
+            img.startsWith("https://") ||
+            img.startsWith("data:image") ||
+            img.startsWith("//")
+        ) {
+
+            imageHTML = `
+
+                <img
+                    src="${escapeHTML(img)}"
+                    alt="${escapeHTML(product.name)}"
+                    loading="lazy"
+                    onerror="this.style.display='none';this.parentElement.innerHTML='🍎';"
+                >
+
+            `;
+
+        } else if (
+            img.length <= 5
+        ) {
+
+            imageHTML =
+                escapeHTML(img);
+
+        } else {
+
+            imageHTML = "🍎";
+
+        }
+
+    } else {
+
+        imageHTML = "🍎";
+
+    }
+
+
+    let unitSelectorHTML = "";
+
+
+    if (
+        product.units &&
+        product.units.length > 1
+    ) {
+
+        unitSelectorHTML = `
+
+            <span class="unit-label">
+                UNIDADE SELECIONADA:
+            </span>
+
+            <div class="unit-buttons">
+
+                ${
+                    product.units
+                        .map(u => `
+
+                            <button
+                                type="button"
+                                class="unit-button ${
+                                    u === currentUnit
+                                        ? "active"
+                                        : ""
+                                }"
+                                onclick="setProductUnit(
+                                    '${escapeAttribute(product.id)}',
+                                    '${escapeAttribute(u)}',
+                                    '${escapeAttribute(category)}'
+                                )"
+                            >
+
+                                ${escapeHTML(u)}
+
+                            </button>
+
+                        `)
+                        .join("")
+                }
+
+            </div>
+
+        `;
+
+    } else {
+
+        unitSelectorHTML = `
+
+            <div class="fixed-unit">
+
+                Unidade:
+                ${escapeHTML(currentUnit)}
+
+            </div>
+
+        `;
+
+    }
+
+
+    /*
+       KG usa passo de 0.1.
+       Outras unidades continuam 1.
+    */
+
+    const quantityStep =
+        normalizarTexto(currentUnit) === "kg"
+            ? "0.1"
+            : "1";
+
+
+    return `
+
+        <div class="product-card">
+
+            <div class="product-header">
+
+                <div class="product-image">
+
+                    ${imageHTML}
+
+                </div>
+
+                <div>
+
+                    <div class="product-name">
+
+                        ${escapeHTML(
+                            product.name
+                        )}
+
+                    </div>
+
+                    <div class="product-category">
+
+                        ${escapeHTML(
+                            category.toUpperCase()
+                        )}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            ${unitSelectorHTML}
+
+
+            <div class="quantity-row">
+
+                <button
+                    type="button"
+                    class="quantity-button"
+                    onclick="updateQuantity(
+                        '${escapeAttribute(product.id)}',
+                        '${escapeAttribute(currentUnit)}',
+                        -1,
+                        '${escapeAttribute(product.name)}'
+                    )"
+                >
+                    −
+                </button>
+
+
+                <div class="quantity-center">
+
+                    <input
+                        class="quantity-input"
+                        type="number"
+                        min="0"
+                        step="${quantityStep}"
+                        value="${qty}"
+                        inputmode="${
+                            normalizarTexto(currentUnit) === "kg"
+                                ? "decimal"
+                                : "numeric"
+                        }"
+                        onchange="changeQuantityInput(
+                            '${escapeAttribute(product.id)}',
+                            '${escapeAttribute(currentUnit)}',
+                            this.value,
+                            '${escapeAttribute(product.name)}'
+                        )"
+                    >
+
+
+                    <span class="quantity-unit">
+
+                        ${escapeHTML(
+                            currentUnit
+                        )}
+
+                    </span>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="quantity-button"
+                    onclick="updateQuantity(
+                        '${escapeAttribute(product.id)}',
+                        '${escapeAttribute(currentUnit)}',
+                        1,
+                        '${escapeAttribute(product.name)}'
+                    )"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   CHAVE DO CARRINHO
+========================================================= */
+
+function makeCartKey(
+    productId,
+    unit
+) {
+
+    return `${productId}__${unit}`;
+
+}
+
+
+/* =========================================================
+   SELEÇÃO DE UNIDADE
+========================================================= */
+
+function setProductUnit(
+    productId,
+    unit,
+    category
+) {
+
+    const unidadeAnterior =
+        selectedUnits[productId];
+
+
+    if (
+        unidadeAnterior !== unit
+    ) {
+
+        removeAllCartUnitsOfProduct(
+            productId
+        );
+
+    }
+
+
+    selectedUnits[productId] =
+        unit;
+
+
+    const searchInput =
+        document.getElementById(
+            `search-${category}`
+        );
+
+
+    renderCategory(
+        category,
+        searchInput
+            ? searchInput.value
+            : ""
+    );
+
+
+    const globalSearch =
+        document.getElementById(
+            "global-search"
+        );
+
+
+    if (
+        globalSearch &&
+        globalSearch.value.trim()
+    ) {
+
+        searchAll(
+            globalSearch.value
+        );
+
+    }
+
+
+    updateCartUI();
+
+}
+
+
+/* =========================================================
+   REMOVER TODAS AS UNIDADES DO PRODUTO
+========================================================= */
+
+function removeAllCartUnitsOfProduct(
+    productId
+) {
+
+    Object.keys(cart)
+        .forEach(key => {
+
+            if (
+                cart[key] &&
+                cart[key].id === productId
+            ) {
+
+                delete cart[key];
+
+            }
+
+        });
+
+}
+
+
+/* =========================================================
+   CONTROLE DO CARRINHO
+========================================================= */
+
+function updateQuantity(
+    productId,
+    unit,
+    change,
+    productName
+) {
+
+    selectedUnits[productId] =
+        unit;
+
+
+    const step =
+        normalizarTexto(unit) === "kg"
+            ? 0.1
+            : 1;
+
+
+    if (change > 0) {
+
+        Object.keys(cart)
+            .forEach(key => {
+
+                if (
+                    cart[key] &&
+                    cart[key].id === productId &&
+                    cart[key].unit !== unit
+                ) {
+
+                    delete cart[key];
+
+                }
+
+            });
+
+    }
+
+
+    const key =
+        makeCartKey(
+            productId,
+            unit
+        );
+
+
+    if (!cart[key]) {
+
+        cart[key] = {
+
+            id:
+                productId,
+
+            name:
+                productName,
+
+            unit:
+                unit,
+
+            quantity:
+                0,
+
+            obs:
+                ""
+
+        };
+
+    }
+
+
+    let novaQuantidade =
+        Number(cart[key].quantity) +
+        (change * step);
+
+
+    if (
+        normalizarTexto(unit) === "kg"
+    ) {
+
+        novaQuantidade =
+            Math.round(
+                novaQuantidade * 10
+            ) / 10;
+
+    }
+
+
+    if (
+        novaQuantidade <= 0
+    ) {
+
+        delete cart[key];
+
+    } else {
+
+        cart[key].quantity =
+            novaQuantidade;
+
+    }
+
+
+    updateCartUI();
+
+
+    if (
+        currentView === "frutas" ||
+        currentView === "legumes" ||
+        currentView === "verduras"
+    ) {
+
+        const search =
+            document.getElementById(
+                `search-${currentView}`
+            );
+
+
+        renderCategory(
+            currentView,
+            search
+                ? search.value
+                : ""
+        );
+
+    }
+
+
+    const globalSearch =
+        document.getElementById(
+            "global-search"
+        );
+
+
+    if (
+        globalSearch &&
+        globalSearch.value.trim()
+    ) {
+
+        searchAll(
+            globalSearch.value
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   DIGITAÇÃO MANUAL
+========================================================= */
+
+function changeQuantityInput(
+    productId,
+    unit,
+    value,
+    productName
+) {
+
+    let quantidade =
+        String(value)
+            .replace(",", ".")
+            .trim();
+
+
+    quantidade =
+        Number(quantidade);
+
+
+    if (
+        !Number.isFinite(quantidade) ||
+        quantidade < 0
+    ) {
+
+        quantidade = 0;
+
+    }
+
+
+    if (
+        normalizarTexto(unit) === "kg"
+    ) {
+
+        quantidade =
+            Math.round(
+                quantidade * 10
+            ) / 10;
+
+    } else {
+
+        quantidade =
+            Math.round(
+                quantidade
+            );
+
+    }
+
+
+    Object.keys(cart)
+        .forEach(key => {
+
+            if (
+                cart[key] &&
+                cart[key].id === productId &&
+                cart[key].unit !== unit
+            ) {
+
+                delete cart[key];
+
+            }
+
+        });
+
+
+    const key =
+        makeCartKey(
+            productId,
+            unit
+        );
+
+
+    if (
+        quantidade <= 0
+    ) {
+
+        delete cart[key];
+
+    } else {
+
+        cart[key] = {
+
+            id:
+                productId,
+
+            name:
+                productName,
+
+            unit:
+                unit,
+
+            quantity:
+                quantidade,
+
+            obs:
+                cart[key]
+                    ? cart[key].obs || ""
+                    : ""
+
+        };
+
+    }
+
+
+    selectedUnits[productId] =
+        unit;
+
+
+    updateCartUI();
+
+
+    if (
+        currentView === "frutas" ||
+        currentView === "legumes" ||
+        currentView === "verduras"
+    ) {
+
+        const search =
+            document.getElementById(
+                `search-${currentView}`
+            );
+
+
+        renderCategory(
+            currentView,
+            search
+                ? search.value
+                : ""
+        );
+
+    }
+
+
+    const globalSearch =
+        document.getElementById(
+            "global-search"
+        );
+
+
+    if (
+        globalSearch &&
+        globalSearch.value.trim()
+    ) {
+
+        searchAll(
+            globalSearch.value
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INTERFACE DA SACOLA
+========================================================= */
+
+function updateCartUI() {
+
+    const totalItems =
+        Object.values(cart)
+            .reduce(
+                (sum, item) =>
+                    sum + item.quantity,
+                0
+            );
+
+
+    const headerCount =
+        document.getElementById(
+            "header-cart-count"
+        );
+
+
+    const floatingCount =
+        document.getElementById(
+            "floating-cart-count"
+        );
+
+
+    if (headerCount) {
+
+        headerCount.textContent =
+            totalItems;
+
+    }
+
+
+    if (floatingCount) {
+
+        floatingCount.textContent =
+            `${totalItems} ${
+                totalItems === 1
+                    ? "item"
+                    : "itens"
+            }`;
+
+    }
+
+
+    const floatingCart =
+        document.getElementById(
+            "floating-cart"
+        );
+
+
+    if (
+        floatingCart
+    ) {
+
+        if (
+            totalItems > 0
+        ) {
+
+            floatingCart.classList.add(
+                "show"
+            );
+
+        } else {
+
+            floatingCart.classList.remove(
+                "show"
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDERIZAR SACOLA
+========================================================= */
+
+function renderCart() {
+
+    const cartContainer =
+        document.getElementById(
+            "cart-list"
+        );
+
+
+    if (!cartContainer) {
+        return;
+    }
+
+
+    const items =
+        Object.keys(cart);
+
+
+    if (
+        items.length === 0
+    ) {
+
+        cartContainer.innerHTML = `
+
+            <div class="cart-empty">
+
+                Sua sacola está vazia.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    cartContainer.innerHTML =
+
+        items
+            .map(key => {
+
+                const item =
+                    cart[key];
+
+
+                const hasObs =
+                    item.obs &&
+                    item.obs.length > 0;
+
+
+                return `
+
+                    <div class="cart-item">
+
+                        <div class="cart-item-main">
+
+
+                            <div class="cart-item-left">
+
+
+                                <div class="cart-item-title-row">
+
+
+                                    <span class="cart-item-name">
+
+                                        ${escapeHTML(
+                                            item.name
+                                        )}
+
+                                    </span>
+
+
+                                    <!-- =================================
+                                         QUANTIDADE CLICÁVEL
+                                    ================================== -->
+
+                                    <div
+                                        class="cart-quantity-edit"
+                                        onclick="openEditQuantity('${escapeAttribute(key)}')"
+                                        title="Alterar quantidade e unidade"
+                                    >
+
+                                        <span class="cart-item-quantity">
+
+                                            ${formatQuantity(
+                                                item.quantity,
+                                                item.unit
+                                            )}
+
+                                            ${escapeHTML(
+                                                item.unit
+                                            )}
+
+                                        </span>
+
+
+                                        <span class="cart-quantity-hint">
+
+                                            Toque para alterar
+
+                                        </span>
+
+                                    </div>
+
+
+                                </div>
+
+
+                                <div class="observation-area">
+
+
+                                    <button
+                                        type="button"
+                                        class="observation-toggle-button"
+                                        onclick="toggleObsEditor('${escapeAttribute(key)}')"
+                                    >
+
+                                        ${
+                                            hasObs
+                                                ? "✏️ Editar observação"
+                                                : "+ Adicionar observação"
+                                        }
+
+                                    </button>
+
+
+                                    <div
+                                        id="obs-editor-${escapeAttribute(key)}"
+                                        class="observation-editor"
+                                    >
+
+
+                                        <textarea
+                                            id="obs-input-${escapeAttribute(key)}"
+                                            class="item-observation"
+                                            placeholder="Ex: Preferência de ponto de maturação..."
+                                        >${escapeHTML(
+                                            item.obs || ""
+                                        )}</textarea>
+
+
+                                        <button
+                                            type="button"
+                                            class="save-observation-button"
+                                            onclick="saveObs('${escapeAttribute(key)}')"
+                                        >
+
+                                            Salvar
+
+                                        </button>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                            <!-- =================================
+                                 LIXEIRA ORIGINAL
+                            ================================== -->
+
+                            <button
+                                type="button"
+                                class="remove-item-button"
+                                onclick="removeItem('${escapeAttribute(key)}')"
+                                aria-label="Remover produto"
+                            >
+
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+
+                                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+
+                                </svg>
+
+                            </button>
+
+
+                        </div>
+
+
+                    </div>
+
+                `;
+
+            })
+            .join("");
+
+}
+
+
+/* =========================================================
+   FORMATAR QUANTIDADE
+========================================================= */
+
+function formatQuantity(
+    quantity,
+    unit
+) {
+
+    if (
+        normalizarTexto(unit) === "kg"
+    ) {
+
+        return Number(quantity)
+            .toFixed(1)
+            .replace(".", ",");
+
+    }
+
+
+    return Number(quantity)
+        .toString();
+
+}
+
+
+/* =========================================================
+   ENCONTRAR AS UNIDADES DISPONÍVEIS DO PRODUTO NO CATÁLOGO
+========================================================= */
+
+function getProductAvailableUnits(productId) {
+    for (let cat in products) {
+        const found = products[cat].find(p => p.id === productId);
+        if (found && found.units && found.units.length > 0) {
+            return found.units;
+        }
+    }
+    return null;
+}
+
+
+/* =========================================================
+   JANELA — ABRIR ALTERAÇÃO (COM SELETOR DE UNIDADES)
+========================================================= */
+
+function openEditQuantity(key) {
+
+    const item =
+        cart[key];
+
+
+    if (!item) {
+        return;
+    }
+
+
+    editingCartKey =
+        key;
+
+
+    const modal =
+        document.getElementById(
+            "edit-quantity-modal"
+        );
+
+
+    const name =
+        document.getElementById(
+            "edit-quantity-product-name"
+        );
+
+
+    const input =
+        document.getElementById(
+            "edit-quantity-input"
+        );
+
+
+    const unitSpan =
+        document.getElementById(
+            "edit-quantity-unit"
+        );
+
+    const unitSelect =
+        document.getElementById(
+            "edit-unit-select"
+        );
+
+
+    name.textContent =
+        item.name;
+
+
+    input.value =
+        item.quantity;
+
+
+    unitSpan.textContent =
+        item.unit;
+
+
+    // Busca as unidades disponíveis para este produto no catálogo
+    let availableUnits = getProductAvailableUnits(item.id);
+    if (!availableUnits || availableUnits.length === 0) {
+        availableUnits = [item.unit];
+    }
+
+
+    // Preenche o select com as opções disponíveis
+    unitSelect.innerHTML = availableUnits.map(u => `
+        <option value="${u}" ${u === item.unit ? 'selected' : ''}>
+            ${u}
+        </option>
+    `).join('');
+
+
+    /*
+       KG permite 0,1.
+       Outras unidades continuam inteiras.
+    */
+
+    if (
+        normalizarTexto(item.unit) === "kg"
+    ) {
+
+        input.step =
+            "0.1";
+
+        input.inputMode =
+            "decimal";
+
+    } else {
+
+        input.step =
+            "1";
+
+        input.inputMode =
+            "numeric";
+
+    }
+
+
+    modal.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =========================================================
+   JANELA — MUDAR UNIDADE DENTRO DO MODAL
+========================================================= */
+
+function changeModalUnit(newUnit) {
+
+    if (!editingCartKey) return;
+
+    const item = cart[editingCartKey];
+    if (!item) return;
+
+    const input = document.getElementById("edit-quantity-input");
+    const unitSpan = document.getElementById("edit-quantity-unit");
+
+    unitSpan.textContent = newUnit;
+
+    if (normalizarTexto(newUnit) === "kg") {
+        input.step = "0.1";
+        input.inputMode = "decimal";
+    } else {
+        input.step = "1";
+        input.inputMode = "numeric";
+        input.value = Math.round(Number(input.value) || 1);
+    }
+
+}
+
+
+/* =========================================================
+   JANELA — FECHAR
+========================================================= */
+
+function closeEditQuantity() {
+
+    const modal =
+        document.getElementById(
+            "edit-quantity-modal"
+        );
+
+
+    if (modal) {
+
+        modal.classList.remove(
+            "show"
+        );
+
+    }
+
+
+    editingCartKey =
+        "";
+
+}
+
+
+/* =========================================================
+   JANELA — + E -
+========================================================= */
+
+function changeEditQuantity(
+    change
+) {
+
+    if (!editingCartKey) {
+        return;
+    }
+
+
+    const item =
+        cart[editingCartKey];
+
+
+    if (!item) {
+        return;
+    }
+
+
+    const input =
+        document.getElementById(
+            "edit-quantity-input"
+        );
+
+    const unitSelect =
+        document.getElementById(
+            "edit-unit-select"
+        );
+
+    const currentUnitModal = unitSelect ? unitSelect.value : item.unit;
+
+
+    let quantity =
+        Number(input.value) || 0;
+
+
+    const isKg =
+        normalizarTexto(
+            currentUnitModal
+        ) === "kg";
+
+
+    const step =
+        isKg
+            ? 0.1
+            : 1;
+
+
+    quantity +=
+        change * step;
+
+
+    if (quantity < 0) {
+
+        quantity = 0;
+
+    }
+
+
+    if (isKg) {
+
+        quantity =
+            Math.round(
+                quantity * 10
+            ) / 10;
+
+    } else {
+
+        quantity =
+            Math.round(quantity);
+
+    }
+
+
+    input.value =
+        quantity;
+
+}
+
+
+/* =========================================================
+   JANELA — SALVAR ALTERAÇÃO
+========================================================= */
+
+function saveEditedQuantity() {
+
+    if (!editingCartKey) {
+        return;
+    }
+
+
+    const item =
+        cart[editingCartKey];
+
+
+    if (!item) {
+
+        closeEditQuantity();
+
+        return;
+
+    }
+
+
+    const input =
+        document.getElementById(
+            "edit-quantity-input"
+        );
+
+    const unitSelect =
+        document.getElementById(
+            "edit-unit-select"
+        );
+
+    const newUnit = unitSelect ? unitSelect.value : item.unit;
+
+
+    let quantity =
+        String(input.value)
+            .replace(",", ".");
+
+
+    quantity =
+        Number(quantity);
+
+
+    if (
+        !Number.isFinite(quantity) ||
+        quantity < 0
+    ) {
+
+        quantity = 0;
+
+    }
+
+
+    const isKg =
+        normalizarTexto(
+            newUnit
+        ) === "kg";
+
+
+    if (isKg) {
+
+        quantity =
+            Math.round(
+                quantity * 10
+            ) / 10;
+
+    } else {
+
+        quantity =
+            Math.round(quantity);
+
+    }
+
+
+    // Remove a chave antiga do carrinho (já que a unidade ou chave pode mudar)
+    delete cart[editingCartKey];
+
+
+    if (quantity > 0) {
+
+        const newKey = makeCartKey(item.id, newUnit);
+
+        cart[newKey] = {
+
+            id:
+                item.id,
+
+            name:
+                item.name,
+
+            unit:
+                newUnit,
+
+            quantity:
+                quantity,
+
+            obs:
+                item.obs || ""
+
+        };
+
+        selectedUnits[item.id] = newUnit;
+
+    }
+
+
+    closeEditQuantity();
+
+    updateCartUI();
+
+    renderCart();
+
+}
+
+
+/* =========================================================
+   OBSERVAÇÃO DO ITEM
+========================================================= */
+
+function toggleObsEditor(
+    key
+) {
+
+    const editor =
+        document.getElementById(
+            `obs-editor-${key}`
+        );
+
+
+    if (editor) {
+
+        editor.classList.toggle(
+            "show"
+        );
+
+    }
+
+}
+
+
+function saveObs(key) {
+
+    const input =
+        document.getElementById(
+            `obs-input-${key}`
+        );
+
+
+    const editor =
+        document.getElementById(
+            `obs-editor-${key}`
+        );
+
+
+    if (
+        input &&
+        cart[key]
+    ) {
+
+        cart[key].obs =
+            input.value.trim();
+
+
+        if (editor) {
+
+            editor.classList.remove(
+                "show"
+            );
+
+        }
+
+
+        renderCart();
+
+    }
+
+}
+
+
+/* =========================================================
+   REMOVER ITEM
+========================================================= */
+
+function removeItem(key) {
+
+    if (
+        cart[key]
+    ) {
+
+        delete cart[key];
+
+    }
+
+
+    updateCartUI();
+
+    renderCart();
+
+}
+
+
+/* =========================================================
+   PESQUISA GLOBAL
+========================================================= */
+
+function searchAll(query) {
+
+    const resultsContainer =
+        document.getElementById(
+            "global-results"
+        );
+
+
+    const categoryMenu =
+        document.getElementById(
+            "category-menu"
+        );
+
+
+    if (
+        !resultsContainer ||
+        !categoryMenu
+    ) {
+
+        return;
+
+    }
+
+
+    const cleanQuery =
+        String(query)
+            .trim()
+            .toLowerCase();
+
+
+    if (!cleanQuery) {
+
+        resultsContainer.innerHTML =
+            "";
+
+
+        resultsContainer.classList.remove(
+            "active"
+        );
+
+
+        categoryMenu.style.display =
+            "grid";
+
+
+        return;
+
+    }
+
+
+    categoryMenu.style.display =
+        "none";
+
+
+    resultsContainer.classList.add(
+        "active"
+    );
+
+
+    let html = "";
+
+
+    Object.keys(products)
+        .forEach(category => {
+
+            const matches =
+                products[category]
+                    .filter(product =>
+                        product.name
+                            .toLowerCase()
+                            .includes(
+                                cleanQuery
+                            )
+                    );
+
+
+            if (
+                matches.length > 0
+            ) {
+
+                html += `
+
+                    <div class="result-category">
+
+                        <div class="result-category-header">
+
+                            ${
+                                category === "frutas"
+                                    ? "🍎"
+                                    : category === "legumes"
+                                        ? "🥕"
+                                        : "🥬"
+                            }
+
+                            ${category.toUpperCase()}
+
+                        </div>
+
+
+                        <div class="products-grid">
+
+                            ${
+                                matches
+                                    .map(product =>
+                                        buildProductCard(
+                                            product,
+                                            category
+                                        )
+                                    )
+                                    .join("")
+                            }
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        });
+
+
+    resultsContainer.innerHTML =
+        html ||
+
+        `
+
+            <div class="no-results">
+
+                Nenhum item encontrado para
+                "${escapeHTML(query)}".
+
+            </div>
+
+        `;
+
+}
+
+
+/* =========================================================
+   ENTREGA
+========================================================= */
+
+function setupDefaultDeliveryDate() {
+
+    const tomorrow =
+        new Date();
+
+
+    tomorrow.setDate(
+        tomorrow.getDate() + 1
+    );
+
+
+    const formattedDate =
+        tomorrow.toLocaleDateString(
+            "pt-BR",
+            {
+                weekday: "long",
+                day: "numeric",
+                month: "long"
+            }
+        );
+
+
+    const nextText =
+        document.getElementById(
+            "next-delivery-text"
+        );
+
+
+    if (nextText) {
+
+        nextText.textContent =
+            formattedDate;
+
+    }
+
+
+    selectedDeliveryDate =
+        formatDateLocal(
+            tomorrow
+        );
+
+}
+
+
+function chooseNextDelivery() {
+
+    document
+        .getElementById(
+            "delivery-next"
+        )
+        .classList.add("active");
+
+
+    document
+        .getElementById(
+            "delivery-custom"
+        )
+        .classList.remove("active");
+
+
+    document
+        .getElementById(
+            "date-wrapper"
+        )
+        .classList.remove("show");
+
+
+    setupDefaultDeliveryDate();
+
+}
+
+
+function chooseCustomDelivery() {
+
+    document
+        .getElementById(
+            "delivery-custom"
+        )
+        .classList.add("active");
+
+
+    document
+        .getElementById(
+            "delivery-next"
+        )
+        .classList.remove("active");
+
+
+    document
+        .getElementById(
+            "date-wrapper"
+        )
+        .classList.add("show");
+
+
+    const input =
+        document.getElementById(
+            "delivery-date"
+        );
+
+
+    if (
+        input &&
+        !input.value
+    ) {
+
+        input.value =
+            selectedDeliveryDate;
+
+    }
+
+}
+
+
+function changeCustomDate() {
+
+    const inputDate =
+        document.getElementById(
+            "delivery-date"
+        ).value;
+
+
+    if (
+        inputDate
+    ) {
+
+        selectedDeliveryDate =
+            inputDate;
+
+    }
+
+}
+
+
+function formatDateLocal(
+    date
+) {
+
+    const year =
+        date.getFullYear();
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
+
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+/* =========================================================
+   HISTÓRICO
+========================================================= */
+
+function checkLastOrder() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                LAST_ORDER_KEY
+            );
+
+
+        if (saved) {
+
+            const parsed =
+                JSON.parse(saved);
+
+
+            if (
+                parsed &&
+                typeof parsed === "object" &&
+                Object.keys(parsed).length > 0
+            ) {
+
+                const repeatCard =
+                    document.getElementById(
+                        "repeat-card"
+                    );
+
+
+                if (repeatCard) {
+
+                    repeatCard.classList.add(
+                        "show"
+                    );
+
+                }
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Erro ao verificar pedido anterior:",
+            error
+        );
+
+    }
+
+}
+
+
+function repeatLastOrder() {
+
+    const saved =
+        localStorage.getItem(
+            LAST_ORDER_KEY
+        );
+
+
+    if (!saved) {
+        return;
+    }
+
+
+    try {
+
+        const previousCart =
+            JSON.parse(saved);
+
+
+        if (
+            !previousCart ||
+            typeof previousCart !== "object"
+        ) {
+
+            return;
+
+        }
+
+
+        cart = {};
+
+
+        Object.keys(previousCart)
+            .forEach(key => {
+
+                const item =
+                    previousCart[key];
+
+
+                if (!item || !item.id) {
+                    return;
+                }
+
+
+                const existing =
+                    Object.values(cart)
+                        .find(
+                            current =>
+                                current.id ===
+                                item.id
+                        );
+
+
+                if (existing) {
+                    return;
+                }
+
+
+                const newKey =
+                    makeCartKey(
+                        item.id,
+                        item.unit
+                    );
+
+
+                cart[newKey] = {
+
+                    id:
+                        item.id,
+
+                    name:
+                        item.name,
+
+                    unit:
+                        item.unit,
+
+                    quantity:
+                        item.quantity,
+
+                    obs:
+                        item.obs || ""
+
+                };
+
+
+                selectedUnits[item.id] =
+                    item.unit;
+
+            });
+
+
+        updateCartUI();
+
+        openCart();
+
+
+    } catch (error) {
+
+        console.error(
+            "Erro ao carregar pedido anterior:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   WHATSAPP
+========================================================= */
+
+function sendWhatsApp() {
+
+    const items =
+        Object.values(cart);
+
+
+    if (
+        items.length === 0
+    ) {
+
+        alert(
+            "Sua sacola está vazia!"
+        );
+
+        return;
+
+    }
+
+
+    localStorage.setItem(
+        LAST_ORDER_KEY,
+        JSON.stringify(cart)
+    );
+
+
+    let message =
+        "🛒 *NOVO PEDIDO - SAMUEL FRUTAS*\n";
+
+
+    message +=
+        "-----------------------------------\n\n";
+
+
+    items.forEach(item => {
+
+        message +=
+            `• *${item.name}*: ${formatQuantity(item.quantity, item.unit)} ${item.unit}\n`;
+
+
+        if (
+            item.obs
+        ) {
+
+            message +=
+                `  _Obs: ${item.obs}_\n`;
+
+        }
+
+    });
+
+
+    message +=
+        "\n-----------------------------------\n";
+
+
+    message +=
+        `📅 *Data de Entrega:* ${formatDateForWhatsApp(selectedDeliveryDate)}\n`;
+
+
+    const generalObservation =
+        document.getElementById(
+            "general-observation"
+        );
+
+
+    const generalObs =
+        generalObservation
+            ? generalObservation.value.trim()
+            : "";
+
+
+    if (
+        generalObs
+    ) {
+
+        message +=
+            `📝 *Observação Geral:* ${generalObs}\n`;
+
+    }
+
+
+    const encodedMessage =
+        encodeURIComponent(
+            message
+        );
+
+
+    window.open(
+        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`,
+        "_blank"
+    );
+
+}
+
+
+/* =========================================================
+   DATA PARA WHATSAPP
+========================================================= */
+
+function formatDateForWhatsApp(
+    value
+) {
+
+    if (!value) {
+        return "Não informada";
+    }
+
+
+    const parts =
+        value.split("-");
+
+
+    if (
+        parts.length !== 3
+    ) {
+
+        return value;
+
+    }
+
+
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+}
+
+
+/* =========================================================
+   SEGURANÇA / HTML
+========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   ESCAPE DE ATRIBUTOS
+========================================================= */
+
+function escapeAttribute(value) {
+
+    return String(value)
+
+        .replaceAll(
+            "\\",
+            "\\\\"
+        )
+
+        .replaceAll(
+            "'",
+            "\\'"
+        )
+
+        .replaceAll(
+            "\n",
+            "\\n"
+        )
+
+        .replaceAll(
+            "\r",
+            "\\r"
+        );
+
+}
+
+</script>
+
+</body>
+
+</html>

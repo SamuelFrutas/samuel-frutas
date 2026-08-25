@@ -4,94 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Importar Legumes e Verduras</title>
-<style>
-body{font-family:Arial,sans-serif;background:#f5f7f5;padding:20px;color:#263238}main{max-width:700px;margin:auto;background:#fff;padding:24px;border-radius:16px;box-shadow:0 4px 18px #0001}button{width:100%;padding:15px;border:0;border-radius:10px;background:#2e7d32;color:#fff;font-weight:700;font-size:16px;cursor:pointer}button:disabled{opacity:.6}#log{margin-top:18px;white-space:pre-wrap;font-size:14px;line-height:1.5}</style>
 </head>
 <body>
-<main>
-<h2>🥕 Importar legumes e verduras</h2>
-<p>Este importador grava os 52 produtos na coleção <b>produtos</b> do Firestore. Produtos existentes com o mesmo ID são atualizados sem apagar os demais campos.</p>
-<button id="btn">Importar 52 produtos</button>
-<div id="log"></div>
-</main>
-<script type="module">
-import { db } from './firebase.js';
-import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
-const produtos = [
-['Abóbora japonesa','legumes',['unidade','quilo'],'abobora japonesa'],
-['Abobrinha','legumes',['unidade','quilo'],'abobrinha'],
-['Aipim','legumes',['unidade','quilo'],'aipim mandioca'],
-['Alho','legumes',['unidade','quilo'],'alho'],
-['Batata inglesa','legumes',['unidade','quilo'],'batata inglesa'],
-['Batata doce','legumes',['unidade','quilo'],'batata doce'],
-['Batata baroa','legumes',['unidade','quilo'],'batata baroa mandioquinha'],
-['Berinjela','legumes',['unidade','quilo'],'berinjela'],
-['Beterraba','legumes',['unidade','quilo'],'beterraba'],
-['Cebola','legumes',['unidade','quilo'],'cebola'],
-['Cenoura','legumes',['unidade','quilo'],'cenoura'],
-['Chuchu','legumes',['unidade','quilo'],'chuchu'],
-['Ervilha','legumes',['unidade','quilo'],'ervilha'],
-['Inhame','legumes',['unidade','quilo'],'inhame'],
-['Giló','legumes',['unidade','quilo'],'gilo jiló'],
-['Pepino','legumes',['unidade','quilo'],'pepino'],
-['Pimentão amarelo','legumes',['unidade','quilo'],'pimentao amarelo'],
-['Pimentão verde','legumes',['unidade','quilo'],'pimentao verde'],
-['Pimentão vermelho','legumes',['unidade','quilo'],'pimentao vermelho'],
-['Quiabo','legumes',['unidade','quilo'],'quiabo'],
-['Repolho','legumes',['unidade','quilo'],'repolho'],
-['Repolho roxo','legumes',['unidade','quilo'],'repolho roxo'],
-['Tomate salada','legumes',['unidade','quilo'],'tomate salada'],
-['Tomate italiano','legumes',['unidade','quilo'],'tomate italiano'],
-['Tomate cereja','legumes',['unidade','quilo'],'tomate cereja'],
-['Vagem macarrão','legumes',['unidade','quilo'],'vagem macarrao'],
-['Vagem manteiga','legumes',['unidade','quilo'],'vagem manteiga'],
-['Alface lisa','verduras',['unidade'],'alface lisa'],
-['Alface crespa','verduras',['unidade'],'alface crespa'],
-['Alface americana','verduras',['unidade'],'alface americana'],
-['Alface roxa','verduras',['unidade'],'alface roxa'],
-['Acelga','verduras',['unidade'],'acelga'],
-['Agrião','verduras',['unidade'],'agriao'],
-['Aipo','verduras',['unidade'],'aipo salsao'],
-['Alho-poró','verduras',['unidade'],'alho poro'],
-['Bertalha','verduras',['unidade'],'bertalha'],
-['Brócolis','verduras',['unidade'],'brocolis'],
-['Brócolis americano','verduras',['unidade'],'brocolis americano'],
-['Cebolinha','verduras',['unidade'],'cebolinha'],
-['Chicória','verduras',['unidade'],'chicoria'],
-['Coentro','verduras',['unidade'],'coentro'],
-['Couve','verduras',['unidade'],'couve manteiga'],
-['Couve-flor','verduras',['unidade'],'couve flor'],
-['Espinafre','verduras',['unidade'],'espinafre'],
-['Hortelã','verduras',['unidade'],'hortela'],
-['Rúcula','verduras',['unidade'],'rucula'],
-['Salsa','verduras',['unidade'],'salsa'],
-['Manjericão','verduras',['unidade'],'manjericao'],
-['Alecrim','verduras',['unidade'],'alecrim'],
-['Tomilho','verduras',['unidade'],'tomilho'],
-['Orégano','verduras',['unidade'],'oregano'],
-['Rabanete','verduras',['unidade'],'rabanete']
-];
-
-function id(nome){return nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');}
-function imagem(query,i){return `https://loremflickr.com/600/600/${encodeURIComponent(query)}?lock=${i+1}`;}
-function dados([nome,categoria,unidades,query],i){
- const u={unidade:unidades.includes('unidade'),quilo:unidades.includes('quilo'),maco:false,duzia:false,lote:false,quantidadePorLote:null};
- return {nome,categoria,ativo:true,imagemUrl:imagem(query,i),unidadesMedida:u,formasVenda:unidades.map(x=>({tipo:x==='unidade'?'Unidade':'Quilo',rotulo:x==='unidade'?'Unidade':'Quilo'})),atualizadoEm:new Date()};
-}
-
-const btn=document.getElementById('btn'); const log=document.getElementById('log');
-btn.onclick=async()=>{
- btn.disabled=true; log.textContent='Iniciando...\n'; let ok=0;
- try{
-  for(let i=0;i<produtos.length;i++){
-   const p=produtos[i];
-   await setDoc(doc(db,'produtos',id(p[0])),dados(p,i),{merge:true});
-   ok++; log.textContent+=`✓ ${p[0]}\n`;
-  }
-  log.textContent+=`\nConcluído: ${ok} produtos gravados.`;
- }catch(e){console.error(e);log.textContent+=`\nERRO após ${ok} produtos: ${e.message||e}`;btn.disabled=false;}
-};
+<p>Verificando autenticação...</p>
+<script>
+window.location.replace('importar-auth.html');
 </script>
 </body>
 </html>

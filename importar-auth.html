@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Autenticando...</title></head>
+<body><p id="status">Verificando acesso...</p><script type="module">
+import { auth } from './firebase.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+const status=document.getElementById('status');
+onAuthStateChanged(auth,(user)=>{
+ if(user){ window.location.replace('importar-verduras-legumes.html'); }
+ else { status.textContent='Você precisa entrar no painel administrativo primeiro.'; setTimeout(()=>window.location.replace('login.html'),1200); }
+});
+</script></body></html>

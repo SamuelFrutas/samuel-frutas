@@ -6,7 +6,7 @@ import { auth } from './firebase.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 const status=document.getElementById('status');
 onAuthStateChanged(auth,(user)=>{
- if(user){ window.location.replace('importar-verduras-legumes.html'); }
+ if(user){ window.location.replace('importar-verduras-legumes-exec.html'); }
  else { status.textContent='Você precisa entrar no painel administrativo primeiro.'; setTimeout(()=>window.location.replace('login.html'),1200); }
 });
 </script></body></html>

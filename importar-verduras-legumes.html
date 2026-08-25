@@ -3,21 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Importação de produtos</title>
-<style>
-body{font-family:Arial,sans-serif;background:#f5f7f5;padding:24px;color:#263238}
-main{max-width:650px;margin:40px auto;background:#fff;padding:24px;border-radius:16px;box-shadow:0 4px 18px #0001}
-.ok{background:#e8f5e9;padding:16px;border-radius:12px}
-</style>
+<title>Importação de legumes e verduras</title>
+<script type="module">
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { collection, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const legumes = [
+'Abóbora japonesa','Abobrinha','Aipim','Alho','Batata inglesa','Batata doce','Batata baroa','Berinjela','Beterraba','Cebola','Cenoura','Chuchu','Ervilha','Inhame','Giló','Pepino','Pimentão amarelo','Pimentão verde','Pimentão vermelho','Quiabo','Repolho','Repolho roxo','Tomate salada','Tomate italiano','Tomate cereja','Vagem macarrão','Vagem manteiga'
+];
+const verduras = [
+'Alface lisa','Alface crespa','Alface americana','Alface roxa','Acelga','Agrião','Aipo','Alho-poró','Bertalha','Brócolis','Brócolis americano','Cebolinha','Chicória','Coentro','Couve','Couve-flor','Espinafre','Hortelã','Rúcula','Salsa','Manjericão','Alecrim','Tomilho','Orégano','Rabanete'
+];
+const slug = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const imageUrl = name => `https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80`;
+
+function build(name, categoria) {
+  const unidadesMedida = categoria === 'legumes'
+    ? { unidade:true, quilo:true, duzia:false, maco:false, bandeja:false, litro:false, garrafa:false, lote:false }
+    : { unidade:true, quilo:false, duzia:false, maco:false, bandeja:false, litro:false, garrafa:false, lote:false };
+  const formasVenda = [];
+  formasVenda.push({ tipo:'unidade', quantidade:1, preco:0 });
+  if (categoria === 'legumes') formasVenda.push({ tipo:'quilo', quantidade:1, preco:0 });
+  return { nome:name, categoria, ativo:true, imagemUrl:imageUrl(name), unidadesMedida, formasVenda, criadoEm:new Date().toISOString() };
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+ const status=document.getElementById('status'), btn=document.getElementById('importar');
+ onAuthStateChanged(auth, user => {
+   if(!user){ status.textContent='Faça login no painel administrativo antes de importar.'; btn.disabled=true; return; }
+   btn.disabled=false;
+   btn.onclick=async()=>{
+     btn.disabled=true; let ok=0;
+     for(const [categoria,lista] of [['legumes',legumes],['verduras',verduras]]){
+       for(const nome of lista){
+         try { await setDoc(doc(collection(db,'produtos'),slug(nome)),build(nome,categoria),{merge:true}); ok++; status.textContent=`Cadastrando ${ok}/52: ${nome}`; }
+         catch(e){ status.textContent=`ERRO em ${nome}: ${e.message}`; btn.disabled=false; return; }
+       }
+     }
+     status.textContent=`Concluído: ${ok}/52 produtos gravados.`;
+     btn.disabled=false;
+   };
+ });
+});
+</script>
+<style>body{font-family:Arial,sans-serif;background:#f5f7f5;padding:24px;color:#263238}main{max-width:650px;margin:40px auto;background:#fff;padding:24px;border-radius:16px;box-shadow:0 4px 18px #0001}button{width:100%;padding:16px;border:0;border-radius:12px;background:#198754;color:#fff;font-size:17px;font-weight:700}button:disabled{opacity:.5}.status{margin-top:16px;padding:14px;border-radius:10px;background:#f1f3f4}</style>
 </head>
-<body>
-<main>
-<h2>🥕 Importação de legumes e verduras</h2>
-<div class="ok">
-<strong>Importação automática ativada.</strong>
-<p>Os 52 produtos são gravados diretamente no Firestore pelo servidor usando as credenciais administrativas do sistema. Não é necessário fazer a importação pelo navegador.</p>
-<p>Após o próximo deploy/reinício do servidor, a rotina cadastra ou atualiza os 52 produtos na coleção <b>produtos</b>.</p>
-</div>
-</main>
-</body>
+<body><main><h2>🥕 Importação de legumes e verduras</h2><p>Importa os 52 produtos usando a mesma autenticação do cadastro administrativo.</p><button id="importar" disabled>Importar 52 produtos</button><div id="status" class="status">Verificando autenticação...</div></main></body>
 </html>

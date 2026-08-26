@@ -28,7 +28,6 @@ onAuthStateChanged(auth, (user) => {
                 .table-wrapper thead { display:none!important; }
                 .table-wrapper tbody { display:block!important; width:100%!important; }
                 .table-wrapper tbody tr { display:block!important; width:100%!important; max-width:100%!important; min-width:0!important; box-sizing:border-box!important; margin:0 0 12px!important; padding:12px!important; border:1px solid var(--borda,#dfe5df)!important; border-radius:14px!important; background:#fff!important; box-shadow:0 3px 12px rgba(0,0,0,.06)!important; overflow:hidden!important; }
-                /* IMPORTANTE: o !important acima precisa respeitar o filtro hidden. */
                 .table-wrapper tbody tr[hidden] { display:none!important; }
                 .table-wrapper td { display:block!important; width:100%!important; max-width:100%!important; min-width:0!important; box-sizing:border-box!important; padding:5px 0!important; border:0!important; font-size:.78rem!important; overflow-wrap:anywhere!important; word-break:break-word!important; }
                 .table-wrapper td:first-child { float:left!important; width:62px!important; max-width:62px!important; padding:0 10px 8px 0!important; }
@@ -40,9 +39,58 @@ onAuthStateChanged(auth, (user) => {
                 .table-wrapper .acoes-celula { display:grid!important; grid-template-columns:1fr 1fr!important; gap:8px!important; width:100%!important; }
                 .table-wrapper .btn-editar, .table-wrapper .btn-excluir { width:100%!important; min-width:0!important; min-height:42px!important; padding:0 6px!important; font-size:.72rem!important; white-space:normal!important; }
                 .table-wrapper .img-tabela { display:block!important; width:52px!important; height:52px!important; max-width:52px!important; object-fit:cover!important; }
+
+                #campo-imagem-arquivo { display:block!important; width:100%!important; margin-top:8px!important; }
+                #campo-imagem-arquivo input[type="file"] { display:block!important; width:100%!important; min-height:50px!important; padding:12px 10px!important; border:1.5px dashed var(--verde,#2e7d32)!important; border-radius:12px!important; background:#f7fbf7!important; font-size:.76rem!important; }
+                #sf-galeria-btn { display:flex!important; width:100%!important; min-height:48px!important; align-items:center!important; justify-content:center!important; margin-bottom:8px!important; border:0!important; border-radius:10px!important; background:var(--verde,#2e7d32)!important; color:#fff!important; font-weight:800!important; font-size:.8rem!important; }
+                #sf-galeria-ajuda { display:block!important; margin:6px 0 0!important; color:#607d8b!important; font-size:.68rem!important; line-height:1.4!important; }
             }
+
+            #campo-imagem-arquivo.sf-galeria-ativo { display:block!important; width:100%!important; margin-top:8px!important; }
+            #sf-galeria-btn { display:flex; align-items:center; justify-content:center; min-height:46px; width:100%; margin:0 0 8px; border:0; border-radius:10px; background:#2e7d32; color:#fff; font-weight:800; font-size:.78rem; cursor:pointer; }
+            #sf-galeria-btn:active { transform:scale(.99); }
+            #sf-galeria-ajuda { display:block; margin:6px 0 0; color:#607d8b; font-size:.68rem; line-height:1.4; }
         `;
         document.head.appendChild(style);
+    }
+
+    function configurarGaleria() {
+        const campo = document.getElementById('campo-imagem-arquivo');
+        const arquivo = document.getElementById('imagem-arquivo');
+        const radios = document.getElementsByName('tipo-imagem');
+        if (!campo || !arquivo) return;
+
+        // O HTML antigo escondia o campo e trazia apenas o modo URL.
+        // O upload do admin.js já está pronto; aqui ativamos a interface no HTML em tempo de execução.
+        campo.classList.add('sf-galeria-ativo');
+        campo.style.setProperty('display', 'block', 'important');
+
+        if (radios.length) {
+            radios[0].value = 'arquivo';
+            radios[0].checked = true;
+        }
+
+        let botao = document.getElementById('sf-galeria-btn');
+        if (!botao) {
+            botao = document.createElement('button');
+            botao.id = 'sf-galeria-btn';
+            botao.type = 'button';
+            botao.textContent = '📷 Escolher imagem da galeria';
+            botao.addEventListener('click', () => arquivo.click());
+            campo.insertBefore(botao, arquivo);
+        }
+
+        if (!document.getElementById('sf-galeria-ajuda')) {
+            const ajuda = document.createElement('div');
+            ajuda.id = 'sf-galeria-ajuda';
+            ajuda.textContent = 'Escolha uma foto da galeria do celular. A prévia aparece automaticamente e a imagem será enviada ao salvar.';
+            campo.appendChild(ajuda);
+        }
+
+        arquivo.setAttribute('accept', 'image/*');
+        arquivo.setAttribute('capture', 'environment');
+        arquivo.style.display = 'block';
+        arquivo.style.width = '100%';
     }
 
     function obter() {
@@ -114,6 +162,7 @@ onAuthStateChanged(auth, (user) => {
 
     function iniciar() {
         instalarEstilos();
+        configurarGaleria();
         ligarEventos();
     }
 

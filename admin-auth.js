@@ -8,12 +8,9 @@ onAuthStateChanged(auth, (user) => {
     }
 
     const headerContent = document.querySelector('.header-content');
-    if (!headerContent) {
-        return;
-    }
+    if (!headerContent) return;
 
-    // Acesso temporário à importação das frutas.
-    // A importação só é executada quando o usuário clicar na página.
+    // Importação de frutas: fica visível diretamente no painel para o usuário autenticado.
     if (!document.getElementById('btn-importar-frutas')) {
         const button = document.createElement('button');
         button.id = 'btn-importar-frutas';
@@ -32,8 +29,7 @@ onAuthStateChanged(auth, (user) => {
         }
     }
 
-    // Ferramenta antiga de correção de imagens.
-    // Continua disponível somente se ainda não tiver sido marcada como concluída.
+    // A antiga ferramenta de correção de imagens continua separada e não interfere na importação.
     if (
         !document.getElementById('btn-corrigir-imagens') &&
         localStorage.getItem('samuel_frutas_imagens_corrigidas') !== '1'

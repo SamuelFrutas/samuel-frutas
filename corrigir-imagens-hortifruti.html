@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Correção de imagens — Samuel Frutas</title>
+<script type="module">
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const produtos = {
+  'Abóbora japonesa':'kabocha,pumpkin,vegetable',
+  'Abobrinha':'zucchini,courgette,vegetable',
+  'Aipim':'cassava,manioc,vegetable',
+  'Alho':'garlic,vegetable',
+  'Batata inglesa':'potato,vegetable',
+  'Batata doce':'sweet-potato,vegetable',
+  'Batata baroa':'parsnip,vegetable',
+  'Berinjela':'eggplant,aubergine,vegetable',
+  'Beterraba':'beetroot,beet,vegetable',
+  'Cebola':'onion,vegetable',
+  'Cenoura':'carrot,vegetable',
+  'Chuchu':'chayote,vegetable',
+  'Ervilha':'green-peas,pea,vegetable',
+  'Inhame':'yam,vegetable',
+  'Giló':'jilo,eggplant,vegetable',
+  'Pepino':'cucumber,vegetable',
+  'Pimentão amarelo':'yellow-bell-pepper,pepper,vegetable',
+  'Pimentão verde':'green-bell-pepper,pepper,vegetable',
+  'Pimentão vermelho':'red-bell-pepper,pepper,vegetable',
+  'Quiabo':'okra,vegetable',
+  'Repolho':'cabbage,vegetable',
+  'Repolho roxo':'red-cabbage,purple-cabbage,vegetable',
+  'Tomate salada':'tomato,vegetable',
+  'Tomate italiano':'roma-tomato,tomato,vegetable',
+  'Tomate cereja':'cherry-tomato,tomato,vegetable',
+  'Vagem macarrão':'green-beans,beans,vegetable',
+  'Vagem manteiga':'wax-beans,beans,vegetable',
+  'Alface lisa':'lettuce,vegetable',
+  'Alface crespa':'leaf-lettuce,lettuce,vegetable',
+  'Alface americana':'iceberg-lettuce,lettuce,vegetable',
+  'Alface roxa':'purple-lettuce,lettuce,vegetable',
+  'Acelga':'swiss-chard,vegetable',
+  'Agrião':'watercress,vegetable',
+  'Aipo':'celery,vegetable',
+  'Alho-poró':'leek,vegetable',
+  'Bertalha':'malabar-spinach,spinach,leafy-green',
+  'Brócolis':'broccoli,vegetable',
+  'Brócolis americano':'broccoli,vegetable',
+  'Cebolinha':'green-onion,scallion,herb',
+  'Chicória':'chicory,leafy-green',
+  'Coentro':'cilantro,coriander,herb',
+  'Couve':'collard-greens,kale,leafy-green',
+  'Couve-flor':'cauliflower,vegetable',
+  'Espinafre':'spinach,leafy-green',
+  'Hortelã':'mint,herb',
+  'Rúcula':'arugula,rocket,leafy-green',
+  'Salsa':'parsley,herb',
+  'Manjericão':'basil,herb',
+  'Alecrim':'rosemary,herb',
+  'Tomilho':'thyme,herb',
+  'Orégano':'oregano,herb',
+  'Rabanete':'radish,vegetable'
+};
+
+const slug = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const imageUrl = (tags, index) => `https://loremflickr.com/900/700/${tags}?lock=${index + 1}`;
+
+const status = document.getElementById('status');
+const btn = document.getElementById('corrigir');
+
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    status.textContent = 'Faça login no painel administrativo primeiro.';
+    btn.disabled = true;
+    return;
+  }
+
+  btn.disabled = false;
+  btn.onclick = async () => {
+    btn.disabled = true;
+    const nomes = Object.keys(produtos);
+    let ok = 0;
+    try {
+      for (let i = 0; i < nomes.length; i++) {
+        const nome = nomes[i];
+        await setDoc(doc(db, 'produtos', slug(nome)), {
+          imagemUrl: imageUrl(produtos[nome], i)
+        }, { merge: true });
+        ok++;
+        status.textContent = `Corrigindo ${ok}/${nomes.length}: ${nome}`;
+      }
+      localStorage.setItem('samuel_frutas_imagens_corrigidas', '1');
+      status.textContent = `Concluído: ${ok} imagens corrigidas. Você já pode voltar ao painel.`;
+    } catch (e) {
+      status.textContent = `ERRO após ${ok} produtos: ${e.message}`;
+      btn.disabled = false;
+    }
+  };
+});
+</script>
+<style>body{font-family:Arial,sans-serif;background:#f5f7f5;padding:24px;color:#263238}main{max-width:650px;margin:40px auto;background:#fff;padding:24px;border-radius:16px;box-shadow:0 4px 18px #0001}button{width:100%;padding:16px;border:0;border-radius:12px;background:#198754;color:#fff;font-size:17px;font-weight:700}button:disabled{opacity:.5}.status{margin-top:16px;padding:14px;border-radius:10px;background:#f1f3f4}</style>
+</head>
+<body><main><h2>🖼️ Corrigir imagens dos legumes e verduras</h2><p>Esta é uma correção única dos 52 produtos já cadastrados. Ela altera somente o campo da imagem e não cria produtos novos.</p><button id="corrigir" disabled>Corrigir imagens dos 52 produtos</button><div id="status" class="status">Verificando autenticação...</div></main></body>
+</html>

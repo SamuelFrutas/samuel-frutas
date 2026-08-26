@@ -8,27 +8,50 @@ onAuthStateChanged(auth, (user) => {
     }
 
     const headerContent = document.querySelector('.header-content');
-    if (!headerContent || document.getElementById('btn-corrigir-imagens')) {
+    if (!headerContent) {
         return;
     }
 
-    if (localStorage.getItem('samuel_frutas_imagens_corrigidas') === '1') {
-        return;
+    // Acesso temporário à importação das frutas.
+    // A importação só é executada quando o usuário clicar na página.
+    if (!document.getElementById('btn-importar-frutas')) {
+        const button = document.createElement('button');
+        button.id = 'btn-importar-frutas';
+        button.type = 'button';
+        button.className = 'header-button';
+        button.textContent = '🍎 Importar frutas';
+        button.addEventListener('click', () => {
+            window.location.href = 'importar-frutas.html';
+        });
+
+        const lojaButton = headerContent.querySelector('.header-button');
+        if (lojaButton) {
+            headerContent.insertBefore(button, lojaButton);
+        } else {
+            headerContent.appendChild(button);
+        }
     }
 
-    const button = document.createElement('button');
-    button.id = 'btn-corrigir-imagens';
-    button.type = 'button';
-    button.className = 'header-button';
-    button.textContent = '🖼️ Corrigir imagens';
-    button.addEventListener('click', () => {
-        window.location.href = 'corrigir-imagens-hortifruti.html';
-    });
+    // Ferramenta antiga de correção de imagens.
+    // Continua disponível somente se ainda não tiver sido marcada como concluída.
+    if (
+        !document.getElementById('btn-corrigir-imagens') &&
+        localStorage.getItem('samuel_frutas_imagens_corrigidas') !== '1'
+    ) {
+        const button = document.createElement('button');
+        button.id = 'btn-corrigir-imagens';
+        button.type = 'button';
+        button.className = 'header-button';
+        button.textContent = '🖼️ Corrigir imagens';
+        button.addEventListener('click', () => {
+            window.location.href = 'corrigir-imagens-hortifruti.html';
+        });
 
-    const lojaButton = headerContent.querySelector('.header-button');
-    if (lojaButton) {
-        headerContent.insertBefore(button, lojaButton);
-    } else {
-        headerContent.appendChild(button);
+        const lojaButton = headerContent.querySelector('.header-button');
+        if (lojaButton) {
+            headerContent.insertBefore(button, lojaButton);
+        } else {
+            headerContent.appendChild(button);
+        }
     }
 });

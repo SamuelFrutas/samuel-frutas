@@ -8,17 +8,21 @@ onAuthStateChanged(auth, (user) => {
     }
 
     const headerContent = document.querySelector('.header-content');
-    if (!headerContent || document.getElementById('btn-importar-legumes-verduras')) {
+    if (!headerContent || document.getElementById('btn-corrigir-imagens')) {
+        return;
+    }
+
+    if (localStorage.getItem('samuel_frutas_imagens_corrigidas') === '1') {
         return;
     }
 
     const button = document.createElement('button');
-    button.id = 'btn-importar-legumes-verduras';
+    button.id = 'btn-corrigir-imagens';
     button.type = 'button';
     button.className = 'header-button';
-    button.textContent = '🥕 Importar legumes e verduras';
+    button.textContent = '🖼️ Corrigir imagens';
     button.addEventListener('click', () => {
-        window.location.href = 'importar-verduras-legumes-exec.html';
+        window.location.href = 'corrigir-imagens-hortifruti.html';
     });
 
     const lojaButton = headerContent.querySelector('.header-button');

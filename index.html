@@ -2034,7 +2034,7 @@ button {
             class="search-input"
             type="search"
             autocomplete="off"
-            placeholder="Pesquisar fruta, legume ou verdura..."
+            placeholder="Pesquisar frutas, legumes, verduras, água de coco ou ovos..."
             oninput="searchAll(this.value)"
         >
 
@@ -2124,6 +2124,11 @@ button {
 
             </div>
 
+        </button>
+
+        <button type="button" class="category-card" onclick="showView('aguaOvos')">
+            <div class="category-icon">🥥🥚</div>
+            <div class="category-info"><h2>Água de coco e ovos caipira</h2><p>Água de coco geladinha e ovos caipira</p></div>
         </button>
 
     </div>
@@ -2318,6 +2323,23 @@ button {
         class="products-grid"
     ></div>
 
+</section>
+
+
+<!-- =========================================================
+     ÁGUA DE COCO E OVOS CAIPIRA
+========================================================= -->
+
+<section id="view-aguaOvos" class="view">
+    <div class="page-top">
+        <button type="button" class="back-button" onclick="showView('home')">← Voltar</button>
+        <h2 class="page-title">🥥🥚 Água de coco e ovos caipira</h2>
+    </div>
+    <div class="search-box">
+        <span class="search-icon">🔎</span>
+        <input id="search-aguaOvos" class="search-input" type="search" autocomplete="off" placeholder="Pesquisar água de coco ou ovos..." oninput="renderCategory('aguaOvos', this.value)">
+    </div>
+    <div id="products-aguaOvos" class="products-grid"></div>
 </section>
 
 
@@ -2619,7 +2641,9 @@ let products = {
 
     legumes: [],
 
-    verduras: []
+    verduras: [],
+
+    aguaOvos: []
 
 };
 
@@ -2687,7 +2711,9 @@ async function loadProductsFromFirebase() {
 
             legumes: [],
 
-            verduras: []
+            verduras: [],
+
+            aguaOvos: []
 
         };
 
@@ -2718,7 +2744,8 @@ async function loadProductsFromFirebase() {
                     normalizarCategoria(
                         data.categoria ||
                         data.category ||
-                        "frutas"
+                        "frutas",
+                        data.nome || data.name || ""
                     );
 
 
@@ -2855,7 +2882,7 @@ function mostrarErroCarregamento() {
    NORMALIZAR CATEGORIA
 ========================================================= */
 
-function normalizarCategoria(categoria) {
+function normalizarCategoria(categoria, nome = "") {
 
     const value =
         String(categoria)
@@ -2867,6 +2894,13 @@ function normalizarCategoria(categoria) {
                 ""
             );
 
+
+    const nomeNormalizado = normalizarTexto(nome);
+
+    if (
+        value.includes("agua de coco") || value.includes("ovos") || value.includes("ovo") || nomeNormalizado.includes("agua de coco") || (nomeNormalizado.includes("coco") && nomeNormalizado.includes("agua")) || nomeNormalizado.includes("ovo")) {
+        return "aguaOvos";
+    }
 
     if (
         value === "legume" ||
@@ -3350,6 +3384,8 @@ function renderAllCategories() {
     renderCategory("legumes");
 
     renderCategory("verduras");
+
+    renderCategory("aguaOvos");
 
 }
 
@@ -3894,7 +3930,8 @@ function updateQuantity(
     if (
         currentView === "frutas" ||
         currentView === "legumes" ||
-        currentView === "verduras"
+        currentView === "verduras" ||
+        currentView === "aguaOvos"
     ) {
 
         const search =

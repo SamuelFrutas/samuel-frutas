@@ -102,7 +102,6 @@ estiloOutros.textContent = `
             align-items: center !important;
             justify-content: center !important;
         }
-
         button.category-card[onclick="showView('aguaOvos')"] .category-icon::before {
             content: "🥥 🥚 🍯";
             display: block;
@@ -113,6 +112,17 @@ estiloOutros.textContent = `
             line-height: 1;
             letter-spacing: -0.04rem;
             transform: none;
+        }
+    }
+    @media (max-width: 749px) {
+        button.category-card[onclick="showView('aguaOvos')"] .category-icon {
+            font-size: 1.25rem !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            letter-spacing: -0.12rem !important;
         }
     }
 `;

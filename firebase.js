@@ -96,7 +96,6 @@ Object.defineProperty(window, "getDocs", {
 
 const estilo = document.createElement("style");
 estilo.textContent = `
-    /* Outros: preserva o visual já aprovado no desktop e no mobile. */
     button.category-card[onclick="showView('aguaOvos')"] .category-icon {
         position: relative !important;
         overflow: hidden !important;
@@ -124,19 +123,29 @@ estilo.textContent = `
             letter-spacing: -0.08rem;
         }
     }
-    .date-input.sunday-disabled {
+    .date-input.sunday-disabled,
+    .date-input.invalid-date-disabled {
         border-color: var(--vermelho) !important;
         background: #fff5f5 !important;
     }
 `;
 document.head.appendChild(estilo);
 
-// Domingo nunca pode ser uma data válida para agendamento.
 function dataEhDomingo(valor) {
     if (!valor) return false;
     const partes = String(valor).split("-").map(Number);
     if (partes.length !== 3 || partes.some(Number.isNaN)) return false;
     return new Date(partes[0], partes[1] - 1, partes[2]).getDay() === 0;
+}
+
+function dataEhHojeOuAnterior(valor) {
+    if (!valor) return false;
+    const partes = String(valor).split("-").map(Number);
+    if (partes.length !== 3 || partes.some(Number.isNaN)) return false;
+    const data = new Date(partes[0], partes[1] - 1, partes[2]);
+    const hoje = new Date();
+    const inicioHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    return data <= inicioHoje;
 }
 
 function obterCampoDataAgendamento() {
@@ -146,44 +155,41 @@ function obterCampoDataAgendamento() {
 
 function proximaEntregaEstaSelecionada() {
     const textos = ["próxima entrega disponível", "proxima entrega disponivel", "próxima entrega", "proxima entrega"];
-    const elementos = [...document.querySelectorAll('label, button, span, div, p')];
-    for (const el of elementos) {
-        const texto = String(el.textContent || "").trim().toLowerCase();
-        if (!textos.some(t => texto.includes(t))) continue;
-        const input = el.matches('input') ? el : el.querySelector('input[type="checkbox"], input[type="radio"]');
-        if (input && input.checked) return true;
-        const associado = el.previousElementSibling?.matches?.('input[type="checkbox"], input[type="radio"]') ? el.previousElementSibling : null;
-        if (associado?.checked) return true;
-        const parentInput = el.parentElement?.querySelector?.('input[type="checkbox"], input[type="radio"]');
-        if (parentInput?.checked) return true;
-    }
     return [...document.querySelectorAll('input[type="checkbox"], input[type="radio"]')].some(input => {
         const bloco = input.closest('label, div, p, section')?.textContent?.toLowerCase() || "";
         return input.checked && textos.some(t => bloco.includes(t));
     });
 }
 
-function rejeitarDomingo(input, mostrarAviso = true) {
-    if (!input || !dataEhDomingo(input.value)) return true;
-    if (mostrarAviso) alert("Não é possível agendar para domingo. Domingo não temos atendimento.");
+function rejeitarDataInvalida(input, mensagem) {
+    if (!input) return false;
+    alert(mensagem);
     input.value = "";
-    input.classList.add("sunday-disabled");
+    input.classList.add("invalid-date-disabled");
     try { input.dispatchEvent(new Event("change", { bubbles: true })); } catch (_) {}
     return false;
 }
 
-function bloquearEnvioNoDomingo(event) {
+function validarDataNoEnvio(event) {
     const input = obterCampoDataAgendamento();
-    if (input && dataEhDomingo(input.value)) {
+    if (!input) return true;
+
+    if (dataEhDomingo(input.value)) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        rejeitarDomingo(input, true);
-        return false;
+        return rejeitarDataInvalida(input, "Não é possível agendar para domingo. Domingo não temos atendimento.");
     }
-    if (input && !input.value && !proximaEntregaEstaSelecionada()) {
+
+    if (input.value && dataEhHojeOuAnterior(input.value)) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        input.classList.add("sunday-disabled");
+        return rejeitarDataInvalida(input, "Não é possível agendar para o dia atual ou para dias anteriores.");
+    }
+
+    if (!input.value && !proximaEntregaEstaSelecionada()) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        input.classList.add("invalid-date-disabled");
         alert("Escolha uma data para o agendamento.");
         try { input.focus(); } catch (_) {}
         return false;
@@ -191,22 +197,17 @@ function bloquearEnvioNoDomingo(event) {
     return true;
 }
 
-// Bloqueia o envio no ponto de saída, sem depender do ID do botão.
-document.addEventListener("submit", bloquearEnvioNoDomingo, true);
+document.addEventListener("submit", validarDataNoEnvio, true);
 document.addEventListener("click", event => {
     const botao = event.target?.closest?.('button, input[type="submit"], [role="button"]');
     if (!botao) return;
     const texto = String(botao.textContent || botao.value || "").trim().toLowerCase();
-    if (texto.includes("enviar") || texto.includes("pedido") || texto.includes("agendar")) {
-        bloquearEnvioNoDomingo(event);
-    }
+    if (texto.includes("enviar") || texto.includes("pedido") || texto.includes("agendar")) validarDataNoEnvio(event);
 }, true);
 
 document.addEventListener("keydown", event => {
     if (event.key !== "Enter") return;
-    const input = obterCampoDataAgendamento();
-    if (input && dataEhDomingo(input.value)) bloquearEnvioNoDomingo(event);
-    else if (input && !input.value && !proximaEntregaEstaSelecionada()) bloquearEnvioNoDomingo(event);
+    validarDataNoEnvio(event);
 }, true);
 
 function instalarBloqueioDomingo() {
@@ -215,13 +216,17 @@ function instalarBloqueioDomingo() {
         campos.forEach(input => {
             if (input.__domingoInstalado) return;
             input.__domingoInstalado = true;
-
             input.addEventListener("change", () => {
-                if (rejeitarDomingo(input)) input.classList.remove("sunday-disabled");
+                if (dataEhDomingo(input.value)) {
+                    rejeitarDataInvalida(input, "Não é possível agendar para domingo. Domingo não temos atendimento.");
+                } else if (dataEhHojeOuAnterior(input.value)) {
+                    rejeitarDataInvalida(input, "Não é possível agendar para o dia atual ou para dias anteriores.");
+                } else {
+                    input.classList.remove("sunday-disabled", "invalid-date-disabled");
+                }
             }, true);
         });
     };
-
     procurar();
     const observer = new MutationObserver(procurar);
     observer.observe(document.documentElement, { childList: true, subtree: true });

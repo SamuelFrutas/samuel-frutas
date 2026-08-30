@@ -93,6 +93,11 @@ const chkDuzia =
 const chkLote =
     document.getElementById('venda-lote');
 
+const chkBdj = document.getElementById('venda-bdj');
+const chkUmQuarto = document.getElementById('venda-1-4');
+const chkUmOitavo = document.getElementById('venda-1-8');
+const chkMetade = document.getElementById('venda-metade');
+
 const grupoQtdLote =
     document.getElementById('grupo-qtd-lote');
 
@@ -563,6 +568,11 @@ function carregarProdutos() {
                 }
 
 
+                if (p.unidadesMedida?.bdj) unidades.push('BDJ');
+                if (p.unidadesMedida?.umQuarto) unidades.push('1/4');
+                if (p.unidadesMedida?.umOitavo) unidades.push('1/8');
+                if (p.unidadesMedida?.metade) unidades.push('Metade');
+
                 if (
                     p.unidadesMedida?.lote
                 ) {
@@ -928,11 +938,11 @@ function preencherFormularioParaEdicao(
     }
 
 
-    if (chkLote) {
-
-        chkLote.checked =
-            !!p.unidadesMedida?.lote;
-    }
+    if (chkLote) chkLote.checked = !!p.unidadesMedida?.lote;
+    if (chkBdj) chkBdj.checked = !!p.unidadesMedida?.bdj;
+    if (chkUmQuarto) chkUmQuarto.checked = !!p.unidadesMedida?.umQuarto;
+    if (chkUmOitavo) chkUmOitavo.checked = !!p.unidadesMedida?.umOitavo;
+    if (chkMetade) chkMetade.checked = !!p.unidadesMedida?.metade;
 
 
     // ==========================================
@@ -1179,6 +1189,10 @@ if (formProduto) {
 
             const permiteLote =
                 !!chkLote?.checked;
+            const permiteBdj = !!chkBdj?.checked;
+            const permiteUmQuarto = !!chkUmQuarto?.checked;
+            const permiteUmOitavo = !!chkUmOitavo?.checked;
+            const permiteMetade = !!chkMetade?.checked;
 
 
             const ativo =
@@ -1210,7 +1224,11 @@ if (formProduto) {
                 !permiteQuilo &&
                 !permiteMaco &&
                 !permiteDuzia &&
-                !permiteLote
+                !permiteLote &&
+                !permiteBdj &&
+                !permiteUmQuarto &&
+                !permiteUmOitavo &&
+                !permiteMetade
             ) {
 
                 alert(
@@ -1424,6 +1442,11 @@ if (formProduto) {
                 }
 
 
+                if (permiteBdj) formasVenda.push({ tipo: 'BDJ', rotulo: 'BDJ' });
+                if (permiteUmQuarto) formasVenda.push({ tipo: '1/4', rotulo: '1/4' });
+                if (permiteUmOitavo) formasVenda.push({ tipo: '1/8', rotulo: '1/8' });
+                if (permiteMetade) formasVenda.push({ tipo: 'Metade', rotulo: 'Metade' });
+
                 if (permiteLote) {
 
                     formasVenda.push({
@@ -1469,6 +1492,11 @@ if (formProduto) {
 
                         lote:
                             permiteLote,
+
+                        bdj: permiteBdj,
+                        umQuarto: permiteUmQuarto,
+                        umOitavo: permiteUmOitavo,
+                        metade: permiteMetade,
 
                         quantidadePorLote:
                             permiteLote

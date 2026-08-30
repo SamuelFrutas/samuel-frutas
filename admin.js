@@ -1188,11 +1188,21 @@ if (formProduto) {
 
 
             const permiteLote =
-                !!chkLote?.checked;
-            const permiteBdj = !!chkBdj?.checked;
-            const permiteUmQuarto = !!chkUmQuarto?.checked;
-            const permiteUmOitavo = !!chkUmOitavo?.checked;
-            const permiteMetade = !!chkMetade?.checked;
+                !!document.querySelector('#venda-lote:checked');
+
+            // Novas formas de venda: consultar diretamente o
+            // formulário no momento de salvar.
+            const permiteBdj =
+                !!document.querySelector('#venda-bdj:checked');
+
+            const permiteUmQuarto =
+                !!document.querySelector('#venda-1-4:checked');
+
+            const permiteUmOitavo =
+                !!document.querySelector('#venda-1-8:checked');
+
+            const permiteMetade =
+                !!document.querySelector('#venda-metade:checked');
 
 
             const ativo =

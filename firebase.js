@@ -91,13 +91,19 @@ Object.defineProperty(window, "getDocs", {
 });
 
 // Desktop: mantém os três emojis de Outros lado a lado e dentro da bolinha.
+// Mobile: os mesmos três emojis ficam lado a lado e dentro da bolinha,
+// sem alterar o restante do layout.
 const estiloOutros = document.createElement("style");
 estiloOutros.textContent = `
+    button.category-card[onclick="showView('aguaOvos')"] .category-icon {
+        position: relative !important;
+        overflow: hidden !important;
+    }
+
     @media (min-width: 750px) {
         button.category-card[onclick="showView('aguaOvos')"] .category-icon {
             font-size: 0 !important;
             white-space: nowrap !important;
-            overflow: hidden !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -111,18 +117,26 @@ estiloOutros.textContent = `
             font-size: 1rem;
             line-height: 1;
             letter-spacing: -0.04rem;
-            transform: none;
         }
     }
+
     @media (max-width: 749px) {
         button.category-card[onclick="showView('aguaOvos')"] .category-icon {
-            font-size: 1.25rem !important;
+            font-size: 0 !important;
             white-space: nowrap !important;
-            overflow: hidden !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            letter-spacing: -0.12rem !important;
+        }
+        button.category-card[onclick="showView('aguaOvos')"] .category-icon::before {
+            content: "🥥 🥚 🍯";
+            display: block;
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+            font-size: 1rem;
+            line-height: 1;
+            letter-spacing: -0.08rem;
         }
     }
 `;

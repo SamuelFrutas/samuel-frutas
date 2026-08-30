@@ -239,10 +239,17 @@ function mostrarPreview(src) {
         return;
     }
 
-    imgPreview.src = src;
+    previewContainer.style.display = 'block';
 
-    previewContainer.style.display =
-        'block';
+    imgPreview.onload = () => {
+        previewContainer.style.display = 'block';
+    };
+
+    imgPreview.onerror = () => {
+        previewContainer.style.display = 'none';
+    };
+
+    imgPreview.src = src;
 }
 
 

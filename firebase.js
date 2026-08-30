@@ -90,15 +90,23 @@ Object.defineProperty(window, "getDocs", {
     }
 });
 
-// Desktop: os três emojis de Outros ficam menores e em uma única linha.
+// Desktop: força os três emojis de Outros a permanecerem lado a lado.
 const estiloOutros = document.createElement("style");
 estiloOutros.textContent = `
-    @media (min-width: 600px) {
+    @media (min-width: 750px) {
         button.category-card[onclick="showView('aguaOvos')"] .category-icon {
-            font-size: 1.35rem !important;
+            font-size: 0 !important;
             white-space: nowrap !important;
-            letter-spacing: -0.12rem;
-            overflow: hidden;
+            overflow: visible !important;
+        }
+
+        button.category-card[onclick="showView('aguaOvos')"] .category-icon::before {
+            content: "🥥 🥚 🍯";
+            display: inline-block;
+            white-space: nowrap;
+            font-size: 1.15rem;
+            line-height: 1;
+            letter-spacing: 0;
         }
     }
 `;

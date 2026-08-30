@@ -90,12 +90,15 @@ Object.defineProperty(window, "getDocs", {
     }
 });
 
-// Somente desktop: reduz os 3 emojis da categoria Outros para não invadirem o título.
+// Desktop: os três emojis de Outros ficam menores e em uma única linha.
 const estiloOutros = document.createElement("style");
 estiloOutros.textContent = `
     @media (min-width: 600px) {
         button.category-card[onclick="showView('aguaOvos')"] .category-icon {
-            font-size: 1.35rem;
+            font-size: 1.35rem !important;
+            white-space: nowrap !important;
+            letter-spacing: -0.12rem;
+            overflow: hidden;
         }
     }
 `;

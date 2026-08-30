@@ -118,6 +118,16 @@ estilo.textContent = `
         border-color: var(--vermelho) !important;
         background: #fff5f5 !important;
     }
+    #view-cart .back-button {
+        background: #d32f2f !important;
+        border-color: #d32f2f !important;
+        color: #ffffff !important;
+    }
+    #view-cart .back-button:hover {
+        background: #b71c1c !important;
+        border-color: #b71c1c !important;
+        color: #ffffff !important;
+    }
 `;
 document.head.appendChild(estilo);
 

@@ -90,23 +90,29 @@ Object.defineProperty(window, "getDocs", {
     }
 });
 
-// Desktop: força os três emojis de Outros a permanecerem lado a lado.
+// Desktop: mantém os três emojis de Outros lado a lado e dentro da bolinha.
 const estiloOutros = document.createElement("style");
 estiloOutros.textContent = `
     @media (min-width: 750px) {
         button.category-card[onclick="showView('aguaOvos')"] .category-icon {
             font-size: 0 !important;
             white-space: nowrap !important;
-            overflow: visible !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
         button.category-card[onclick="showView('aguaOvos')"] .category-icon::before {
             content: "🥥 🥚 🍯";
-            display: inline-block;
+            display: block;
+            width: 100%;
+            text-align: center;
             white-space: nowrap;
-            font-size: 1.15rem;
+            font-size: 1rem;
             line-height: 1;
-            letter-spacing: 0;
+            letter-spacing: -0.04rem;
+            transform: none;
         }
     }
 `;

@@ -210,6 +210,43 @@ document.addEventListener("keydown", event => {
     validarDataNoEnvio(event);
 }, true);
 
+// Validação imediata também para calendários/campos que não usam type="date".
+function extrairDataDoValor(valor) {
+    const texto = String(valor || "").trim();
+    let m = texto.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (m) return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
+    m = texto.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+    if (m) return `${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`;
+    return "";
+}
+
+function campoPareceData(el) {
+    if (!el) return false;
+    const texto = `${el.id || ""} ${el.name || ""} ${el.className || ""} ${el.getAttribute?.("aria-label") || ""}`.toLowerCase();
+    return el.matches?.('input[type="date"]') || /data|date|entrega|agend/.test(texto);
+}
+
+function validarDataImediatamente(event) {
+    const input = event.target?.closest?.('input, select, textarea');
+    if (!campoPareceData(input)) return;
+    const valor = extrairDataDoValor(input.value);
+    if (!valor) return;
+    if (dataEhDomingo(valor)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        rejeitarDataInvalida(input, "Não é possível agendar para domingo. Domingo não temos atendimento.");
+        return;
+    }
+    if (dataEhHojeOuAnterior(valor)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        rejeitarDataInvalida(input, "Não é possível agendar para o dia atual ou para dias anteriores.");
+    }
+}
+
+document.addEventListener("change", validarDataImediatamente, true);
+document.addEventListener("input", validarDataImediatamente, true);
+
 function instalarBloqueioDomingo() {
     const procurar = () => {
         const campos = [...document.querySelectorAll('input[type="date"], #delivery-date, .date-input')];

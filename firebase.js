@@ -139,17 +139,49 @@ function dataEhDomingo(valor) {
     return new Date(partes[0], partes[1] - 1, partes[2]).getDay() === 0;
 }
 
-function rejeitarDomingo(input) {
+function obterCampoDataAgendamento() {
+    return [...document.querySelectorAll('input[type="date"], #delivery-date, .date-input')]
+        .find(input => input.value) || document.querySelector('input[type="date"], #delivery-date, .date-input');
+}
+
+function rejeitarDomingo(input, mostrarAviso = true) {
     if (!input || !dataEhDomingo(input.value)) return true;
+    if (mostrarAviso) alert("Não é possível agendar para domingo. Domingo não temos atendimento.");
     input.value = "";
     input.classList.add("sunday-disabled");
     try { input.dispatchEvent(new Event("change", { bubbles: true })); } catch (_) {}
     return false;
 }
 
+function bloquearEnvioNoDomingo(event) {
+    const input = obterCampoDataAgendamento();
+    if (input && dataEhDomingo(input.value)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        rejeitarDomingo(input, true);
+        return false;
+    }
+    return true;
+}
+
+// Bloqueia o envio no ponto de saída, sem depender do ID do botão.
+document.addEventListener("submit", bloquearEnvioNoDomingo, true);
+document.addEventListener("click", event => {
+    const botao = event.target?.closest?.('button, input[type="submit"], [role="button"]');
+    if (!botao) return;
+    const texto = String(botao.textContent || botao.value || "").trim().toLowerCase();
+    if (texto.includes("enviar") || texto.includes("pedido") || texto.includes("agendar")) {
+        bloquearEnvioNoDomingo(event);
+    }
+}, true);
+
+document.addEventListener("keydown", event => {
+    if (event.key !== "Enter") return;
+    const input = obterCampoDataAgendamento();
+    if (input && dataEhDomingo(input.value)) bloquearEnvioNoDomingo(event);
+}, true);
+
 function instalarBloqueioDomingo() {
-    // O campo atual pode mudar de id/classe conforme a tela; por isso
-    // localizamos qualquer input de data e também o id tradicional.
     const procurar = () => {
         const campos = [...document.querySelectorAll('input[type="date"], #delivery-date, .date-input')];
         campos.forEach(input => {
@@ -159,10 +191,6 @@ function instalarBloqueioDomingo() {
             input.addEventListener("change", () => {
                 if (rejeitarDomingo(input)) input.classList.remove("sunday-disabled");
             }, true);
-            input.addEventListener("input", () => {
-                if (rejeitarDomingo(input)) input.classList.remove("sunday-disabled");
-            }, true);
-            input.addEventListener("blur", () => rejeitarDomingo(input), true);
         });
     };
 

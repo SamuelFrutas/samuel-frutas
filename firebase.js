@@ -90,10 +90,6 @@ Object.defineProperty(window, "getDocs", {
     }
 });
 
-// =========================================================
-// DOM: regras visuais e calendário
-// =========================================================
-
 const estilo = document.createElement("style");
 estilo.textContent = `
     button.category-card[onclick="showView('aguaOvos')"] .category-icon {
@@ -110,18 +106,10 @@ estilo.textContent = `
         text-align: center;
         white-space: nowrap;
         line-height: 1;
-    }
-    @media (min-width: 750px) {
-        button.category-card[onclick="showView('aguaOvos')"] .category-icon::before {
-            font-size: 1rem;
-            letter-spacing: -0.04rem;
-        }
-    }
-    @media (max-width: 749px) {
-        button.category-card[onclick="showView('aguaOvos')"] .category-icon::before {
-            font-size: 1rem;
-            letter-spacing: -0.08rem;
-        }
+        font-size: clamp(.72rem, 3.2vw, 1.05rem);
+        letter-spacing: -.08rem;
+        transform: scale(.88);
+        transform-origin: center;
     }
     .date-input.sunday-disabled,
     .date-input.invalid-date-disabled {
@@ -131,145 +119,88 @@ estilo.textContent = `
 `;
 document.head.appendChild(estilo);
 
-function dataEhDomingo(valor) {
-    if (!valor) return false;
+function lerData(valor) {
+    if (!valor) return null;
     const partes = String(valor).split("-").map(Number);
-    if (partes.length !== 3 || partes.some(Number.isNaN)) return false;
-    return new Date(partes[0], partes[1] - 1, partes[2]).getDay() === 0;
+    if (partes.length !== 3 || partes.some(Number.isNaN)) return null;
+    return new Date(partes[0], partes[1] - 1, partes[2]);
 }
-
+function dataEhDomingo(valor) { const d=lerData(valor); return !!d && d.getDay()===0; }
 function dataEhHojeOuAnterior(valor) {
-    if (!valor) return false;
-    const partes = String(valor).split("-").map(Number);
-    if (partes.length !== 3 || partes.some(Number.isNaN)) return false;
-    const data = new Date(partes[0], partes[1] - 1, partes[2]);
-    const hoje = new Date();
-    const inicioHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-    return data <= inicioHoje;
+    const d=lerData(valor); if(!d) return false;
+    const agora=new Date();
+    const hoje=new Date(agora.getFullYear(),agora.getMonth(),agora.getDate());
+    return d <= hoje;
 }
-
-function obterCampoDataAgendamento() {
-    return [...document.querySelectorAll('input[type="date"], #delivery-date, .date-input')]
-        .find(input => input.value) || document.querySelector('input[type="date"], #delivery-date, .date-input');
+function obterCampoDataAgendamento(){
+    return [...document.querySelectorAll('input[type="date"], input[name*="date" i], input[id*="date" i], input[name*="data" i], input[id*="data" i], .date-input')].find(i=>i.offsetParent!==null) || null;
 }
-
-function proximaEntregaEstaSelecionada() {
-    const textos = ["próxima entrega disponível", "proxima entrega disponivel", "próxima entrega", "proxima entrega"];
-    return [...document.querySelectorAll('input[type="checkbox"], input[type="radio"]')].some(input => {
-        const bloco = input.closest('label, div, p, section')?.textContent?.toLowerCase() || "";
-        return input.checked && textos.some(t => bloco.includes(t));
-    });
+function proximaEntregaEstaSelecionada(){
+    return [...document.querySelectorAll('input[type="checkbox"],input[type="radio"]')].some(i=>i.checked && /próxima entrega disponível|proxima entrega disponivel|próxima entrega|proxima entrega/i.test(i.closest('label,div,p,section')?.textContent||''));
 }
-
-function rejeitarDataInvalida(input, mensagem) {
-    if (!input) return false;
+function rejeitarDataInvalida(input,mensagem){
+    if(!input)return false;
     alert(mensagem);
-    input.value = "";
+    input.value="";
     input.classList.add("invalid-date-disabled");
-    try { input.dispatchEvent(new Event("change", { bubbles: true })); } catch (_) {}
     return false;
 }
-
-function validarDataNoEnvio(event) {
-    const input = obterCampoDataAgendamento();
-    if (!input) return true;
-
-    if (dataEhDomingo(input.value)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        return rejeitarDataInvalida(input, "Não é possível agendar para domingo. Domingo não temos atendimento.");
-    }
-
-    if (input.value && dataEhHojeOuAnterior(input.value)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        return rejeitarDataInvalida(input, "Não é possível agendar para o dia atual ou para dias anteriores.");
-    }
-
-    if (!input.value && !proximaEntregaEstaSelecionada()) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        input.classList.add("invalid-date-disabled");
-        alert("Escolha uma data para o agendamento.");
-        try { input.focus(); } catch (_) {}
-        return false;
-    }
+function validarDataNoEnvio(event){
+    const input=obterCampoDataAgendamento();
+    if(!input)return true;
+    if(dataEhDomingo(input.value)){event.preventDefault();event.stopImmediatePropagation();return rejeitarDataInvalida(input,"Não é possível agendar para domingo. Domingo não temos atendimento.");}
+    if(input.value && dataEhHojeOuAnterior(input.value)){event.preventDefault();event.stopImmediatePropagation();return rejeitarDataInvalida(input,"Não é possível agendar para o dia atual ou para dias anteriores.");}
+    if(!input.value&&!proximaEntregaEstaSelecionada()){event.preventDefault();event.stopImmediatePropagation();input.classList.add("invalid-date-disabled");alert("Escolha uma data para o agendamento.");try{input.focus();}catch(_){}return false;}
     return true;
 }
+document.addEventListener("submit",validarDataNoEnvio,true);
+document.addEventListener("click",event=>{
+    const b=event.target?.closest?.('button,input[type="submit"],[role="button"]'); if(!b)return;
+    const t=String(b.textContent||b.value||"").trim().toLowerCase();
+    if(t.includes("enviar")||t.includes("pedido")||t.includes("agendar"))validarDataNoEnvio(event);
+},true);
+document.addEventListener("keydown",event=>{if(event.key==="Enter")validarDataNoEnvio(event)},true);
 
-document.addEventListener("submit", validarDataNoEnvio, true);
-document.addEventListener("click", event => {
-    const botao = event.target?.closest?.('button, input[type="submit"], [role="button"]');
-    if (!botao) return;
-    const texto = String(botao.textContent || botao.value || "").trim().toLowerCase();
-    if (texto.includes("enviar") || texto.includes("pedido") || texto.includes("agendar")) validarDataNoEnvio(event);
-}, true);
-
-document.addEventListener("keydown", event => {
-    if (event.key !== "Enter") return;
-    validarDataNoEnvio(event);
-}, true);
-
-// Validação imediata também para calendários/campos que não usam type="date".
-function extrairDataDoValor(valor) {
-    const texto = String(valor || "").trim();
-    let m = texto.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-    if (m) return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
-    m = texto.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
-    if (m) return `${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`;
+function normalizarData(valor){
+    const t=String(valor||"").trim();
+    let m=t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if(m)return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
+    m=t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+    if(m)return `${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`;
     return "";
 }
-
-function campoPareceData(el) {
-    if (!el) return false;
-    const texto = `${el.id || ""} ${el.name || ""} ${el.className || ""} ${el.getAttribute?.("aria-label") || ""}`.toLowerCase();
+function campoPareceData(el){
+    if(!el)return false;
+    const texto=`${el.id||""} ${el.name||""} ${el.className||""} ${el.getAttribute?.("aria-label")||""}`.toLowerCase();
     return el.matches?.('input[type="date"]') || /data|date|entrega|agend/.test(texto);
 }
-
-function validarDataImediatamente(event) {
-    const input = event.target?.closest?.('input, select, textarea');
-    if (!campoPareceData(input)) return;
-    const valor = extrairDataDoValor(input.value);
-    if (!valor) return;
-    if (dataEhDomingo(valor)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        rejeitarDataInvalida(input, "Não é possível agendar para domingo. Domingo não temos atendimento.");
-        return;
-    }
-    if (dataEhHojeOuAnterior(valor)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        rejeitarDataInvalida(input, "Não é possível agendar para o dia atual ou para dias anteriores.");
-    }
+function validarDataImediatamente(event){
+    const input=event.target?.closest?.('input,select,textarea');
+    if(!campoPareceData(input))return;
+    const valor=normalizarData(input.value);
+    if(!valor)return;
+    if(dataEhDomingo(valor)){event.preventDefault();event.stopImmediatePropagation();rejeitarDataInvalida(input,"Não é possível agendar para domingo. Domingo não temos atendimento.");return;}
+    if(dataEhHojeOuAnterior(valor)){event.preventDefault();event.stopImmediatePropagation();rejeitarDataInvalida(input,"Não é possível agendar para o dia atual ou para dias anteriores.");}
 }
+document.addEventListener("change",validarDataImediatamente,true);
+document.addEventListener("input",validarDataImediatamente,true);
 
-document.addEventListener("change", validarDataImediatamente, true);
-document.addEventListener("input", validarDataImediatamente, true);
-
-function instalarBloqueioDomingo() {
-    const procurar = () => {
-        const campos = [...document.querySelectorAll('input[type="date"], #delivery-date, .date-input')];
-        campos.forEach(input => {
-            if (input.__domingoInstalado) return;
-            input.__domingoInstalado = true;
-            input.addEventListener("change", () => {
-                if (dataEhDomingo(input.value)) {
-                    rejeitarDataInvalida(input, "Não é possível agendar para domingo. Domingo não temos atendimento.");
-                } else if (dataEhHojeOuAnterior(input.value)) {
-                    rejeitarDataInvalida(input, "Não é possível agendar para o dia atual ou para dias anteriores.");
-                } else {
-                    input.classList.remove("sunday-disabled", "invalid-date-disabled");
-                }
-            }, true);
-        });
-    };
+function instalarBloqueioDatas(){
+    const procurar=()=>document.querySelectorAll('input[type="date"],input[name*="date" i],input[id*="date" i],input[name*="data" i],input[id*="data" i],.date-input').forEach(input=>{
+        if(input.__samuelDataInstalled)return;
+        input.__samuelDataInstalled=true;
+        const validar=()=>{
+            if(dataEhDomingo(input.value))rejeitarDataInvalida(input,"Não é possível agendar para domingo. Domingo não temos atendimento.");
+            else if(dataEhHojeOuAnterior(input.value))rejeitarDataInvalida(input,"Não é possível agendar para o dia atual ou para dias anteriores.");
+            else input.classList.remove("sunday-disabled","invalid-date-disabled");
+        };
+        input.addEventListener("change",validar,true);
+        input.addEventListener("input",validar,true);
+    });
     procurar();
-    const observer = new MutationObserver(procurar);
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+    new MutationObserver(procurar).observe(document.documentElement,{childList:true,subtree:true});
 }
-
-document.addEventListener("DOMContentLoaded", instalarBloqueioDomingo);
-if (document.readyState !== "loading") instalarBloqueioDomingo();
+document.addEventListener("DOMContentLoaded",instalarBloqueioDatas);
+if(document.readyState!=="loading")instalarBloqueioDatas();
 
 export { app, auth, db, storage };

@@ -144,6 +144,25 @@ function obterCampoDataAgendamento() {
         .find(input => input.value) || document.querySelector('input[type="date"], #delivery-date, .date-input');
 }
 
+function proximaEntregaEstaSelecionada() {
+    const textos = ["próxima entrega disponível", "proxima entrega disponivel", "próxima entrega", "proxima entrega"];
+    const elementos = [...document.querySelectorAll('label, button, span, div, p')];
+    for (const el of elementos) {
+        const texto = String(el.textContent || "").trim().toLowerCase();
+        if (!textos.some(t => texto.includes(t))) continue;
+        const input = el.matches('input') ? el : el.querySelector('input[type="checkbox"], input[type="radio"]');
+        if (input && input.checked) return true;
+        const associado = el.previousElementSibling?.matches?.('input[type="checkbox"], input[type="radio"]') ? el.previousElementSibling : null;
+        if (associado?.checked) return true;
+        const parentInput = el.parentElement?.querySelector?.('input[type="checkbox"], input[type="radio"]');
+        if (parentInput?.checked) return true;
+    }
+    return [...document.querySelectorAll('input[type="checkbox"], input[type="radio"]')].some(input => {
+        const bloco = input.closest('label, div, p, section')?.textContent?.toLowerCase() || "";
+        return input.checked && textos.some(t => bloco.includes(t));
+    });
+}
+
 function rejeitarDomingo(input, mostrarAviso = true) {
     if (!input || !dataEhDomingo(input.value)) return true;
     if (mostrarAviso) alert("Não é possível agendar para domingo. Domingo não temos atendimento.");
@@ -159,6 +178,14 @@ function bloquearEnvioNoDomingo(event) {
         event.preventDefault();
         event.stopImmediatePropagation();
         rejeitarDomingo(input, true);
+        return false;
+    }
+    if (input && !input.value && !proximaEntregaEstaSelecionada()) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        input.classList.add("sunday-disabled");
+        alert("Escolha uma data para o agendamento.");
+        try { input.focus(); } catch (_) {}
         return false;
     }
     return true;
@@ -179,6 +206,7 @@ document.addEventListener("keydown", event => {
     if (event.key !== "Enter") return;
     const input = obterCampoDataAgendamento();
     if (input && dataEhDomingo(input.value)) bloquearEnvioNoDomingo(event);
+    else if (input && !input.value && !proximaEntregaEstaSelecionada()) bloquearEnvioNoDomingo(event);
 }, true);
 
 function instalarBloqueioDomingo() {

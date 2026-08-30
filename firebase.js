@@ -109,6 +109,9 @@ estilo.textContent = `
         background-position: center;
         background-size: contain;
     }
+    button.category-card[onclick="showView('aguaOvos')"] .category-icon > * {
+        display: none !important;
+    }
     .date-input.sunday-disabled,
     .date-input.invalid-date-disabled {
         border-color: var(--vermelho) !important;

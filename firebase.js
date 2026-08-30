@@ -100,16 +100,14 @@ estilo.textContent = `
         justify-content: center !important;
     }
     button.category-card[onclick="showView('aguaOvos')"] .category-icon::before {
-        content: "🥥 🥚 🍯";
+        content: "";
         display: block;
         width: 100%;
-        text-align: center;
-        white-space: nowrap;
-        line-height: 1;
-        font-size: clamp(.72rem, 3.2vw, 1.05rem);
-        letter-spacing: -.08rem;
-        transform: scale(.88);
-        transform-origin: center;
+        height: 100%;
+        background-image: url("./imagens/Gemini_Generated_Image_qc1508qc1508qc15.jpg");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
     }
     .date-input.sunday-disabled,
     .date-input.invalid-date-disabled {

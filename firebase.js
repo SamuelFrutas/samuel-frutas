@@ -195,7 +195,6 @@ function instalarBloqueioDatas(){
         input.addEventListener("change",validar,true);
         input.addEventListener("input",validar,true);
     });
-    procurar();
     new MutationObserver(procurar).observe(document.documentElement,{childList:true,subtree:true});
 }
 document.addEventListener("DOMContentLoaded",instalarBloqueioDatas);

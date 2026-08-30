@@ -204,4 +204,47 @@ function instalarBloqueioDatas(){
 document.addEventListener("DOMContentLoaded",instalarBloqueioDatas);
 if(document.readyState!=="loading")instalarBloqueioDatas();
 
+/* =========================================================
+   SACOLA FLUTUANTE — OCULTAR SOMENTE DENTRO DA SACOLA
+   Observa a navegação real das telas (.view.active), sem
+   interferir em quantidade, produtos ou no conteúdo da sacola.
+========================================================= */
+function sincronizarSacolaFlutuante() {
+    const cartView = document.getElementById("view-cart");
+    const floatingCart = document.getElementById("floating-cart");
+    if (!cartView || !floatingCart) return;
+
+    const dentroDaSacola = cartView.classList.contains("active");
+
+    floatingCart.style.visibility = dentroDaSacola ? "hidden" : "visible";
+    floatingCart.style.pointerEvents = dentroDaSacola ? "none" : "auto";
+}
+
+function instalarControleSacolaFlutuante() {
+    sincronizarSacolaFlutuante();
+
+    const observer = new MutationObserver(() => {
+        sincronizarSacolaFlutuante();
+    });
+
+    document.querySelectorAll(".view").forEach(view => {
+        observer.observe(view, {
+            attributes: true,
+            attributeFilter: ["class"]
+        });
+    });
+
+    const bodyObserver = new MutationObserver(() => {
+        sincronizarSacolaFlutuante();
+    });
+
+    bodyObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
+document.addEventListener("DOMContentLoaded", instalarControleSacolaFlutuante);
+if (document.readyState !== "loading") instalarControleSacolaFlutuante();
+
 export { app, auth, db, storage };

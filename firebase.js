@@ -55,23 +55,12 @@ const storage = getStorage(app);
 
 // =========================================================
 // COMPATIBILIDADE DAS FORMAS DE VENDA NO AGENDAMENTO
-//
-// O index.html já possui a leitura original de unidades. O painel
-// passou a salvar também BDJ, 1/4, 1/8 e metade. Este adaptador
-// apenas acrescenta essas formas aos dados que chegam ao catálogo,
-// sem substituir a lógica original.
 // =========================================================
 
 function adaptarDadosProduto(data) {
 
-    const resultado = {
-        ...data,
-        unidadesMedida: data?.unidadesMedida
-            ? { ...data.unidadesMedida }
-            : undefined
-    };
-
-    const u = resultado.unidadesMedida || {};
+    const resultado = { ...data };
+    const u = data?.unidadesMedida || {};
     const formas = data?.formasVenda || data?.formasDeVenda;
 
     const temForma = (nome, ...alternativas) => {
@@ -88,38 +77,51 @@ function adaptarDadosProduto(data) {
         return false;
     };
 
-    if (temForma("bdj", "bdj", "bandeja")) {
-        resultado.unidadesMedida = resultado.unidadesMedida || {};
-        resultado.unidadesMedida.bdj = true;
+    const unidades = [];
+
+    // Preserva todas as formas antigas que o agendamento já entende.
+    if (u.unidade === true || data?.unidade === true || data?.un === true) unidades.push("UN");
+    if (u.quilo === true || data?.quilo === true || data?.kg === true) unidades.push("KG");
+    if (u.maco === true || data?.maco === true || data?.maço === true) unidades.push("MAÇO");
+    if (u.duzia === true || data?.duzia === true || data?.dúzia === true) unidades.push("DÚZIA");
+
+    if (u.lote === true || data?.lote === true) {
+        const qtd = parseInt(u.quantidadePorLote || data?.quantidadeLote || 3, 10);
+        unidades.push(qtd > 0 ? `LOTE C/${qtd}` : "LOTE");
     }
 
-    if (temForma("umQuarto", "1/4", "¼", "um quarto")) {
-        resultado.unidadesMedida = resultado.unidadesMedida || {};
-        resultado.unidadesMedida.umQuarto = true;
+    // Novas formas solicitadas.
+    if (temForma("bdj", "bdj", "bandeja")) unidades.push("BDJ");
+    if (temForma("umQuarto", "1/4", "¼", "um quarto")) unidades.push("1/4");
+    if (temForma("umOitavo", "1/8", "⅛", "um oitavo")) unidades.push("1/8");
+    if (temForma("metade", "metade", "1/2", "½")) unidades.push("METADE");
+
+    // Formato antigo em array também é preservado.
+    const listaAntiga = data?.unidades || data?.units;
+    if (Array.isArray(listaAntiga)) {
+        listaAntiga.forEach(v => {
+            const texto = String(v).trim().toUpperCase();
+            if (texto.includes("BDJ") || texto.includes("BANDEJA")) unidades.push("BDJ");
+            else if (texto.includes("1/4") || texto.includes("¼")) unidades.push("1/4");
+            else if (texto.includes("1/8") || texto.includes("⅛")) unidades.push("1/8");
+            else if (texto.includes("METADE") || texto.includes("1/2") || texto.includes("½")) unidades.push("METADE");
+            else unidades.push(texto);
+        });
     }
 
-    if (temForma("umOitavo", "1/8", "⅛", "um oitavo")) {
-        resultado.unidadesMedida = resultado.unidadesMedida || {};
-        resultado.unidadesMedida.umOitavo = true;
-    }
-
-    if (temForma("metade", "metade", "1/2", "½")) {
-        resultado.unidadesMedida = resultado.unidadesMedida || {};
-        resultado.unidadesMedida.metade = true;
+    if (unidades.length > 0) {
+        // Faz o index.html usar a lista consolidada, evitando o fallback para UN.
+        resultado.unidades = [...new Set(unidades)];
+        resultado.units = resultado.unidades;
+        resultado.unidadesMedida = undefined;
     }
 
     return resultado;
 }
 
 
-// O index.html atribui o getDocs à janela depois que este módulo
-// é carregado. Interceptamos somente essa atribuição para adaptar
-// os dados dos produtos; nenhuma outra operação do Firebase muda.
-const descriptorOriginal = Object.getOwnPropertyDescriptor(
-    window,
-    "getDocs"
-);
-
+// O index.html atribui getDocs à janela depois que este módulo é carregado.
+// Interceptamos apenas essa atribuição para adaptar os dados dos produtos.
 Object.defineProperty(window, "getDocs", {
     configurable: true,
     get() {
@@ -145,8 +147,7 @@ Object.defineProperty(window, "getDocs", {
                     }
 
                     return callback => target.forEach(docSnap => {
-                        const originalData = docSnap.data();
-                        const adaptedData = adaptarDadosProduto(originalData);
+                        const adaptedData = adaptarDadosProduto(docSnap.data());
 
                         const adaptedDoc = new Proxy(docSnap, {
                             get(docTarget, docProp, docReceiver) {

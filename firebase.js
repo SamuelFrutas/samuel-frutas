@@ -90,12 +90,19 @@ Object.defineProperty(window, "getDocs", {
     }
 });
 
-// Desktop/mobile: mantém os três emojis de Outros dentro da bolinha e lado a lado.
-const estiloOutros = document.createElement("style");
-estiloOutros.textContent = `
+// =========================================================
+// DOM: regras visuais e calendário
+// =========================================================
+
+const estilo = document.createElement("style");
+estilo.textContent = `
+    /* Outros: preserva o visual já aprovado no desktop e no mobile. */
     button.category-card[onclick="showView('aguaOvos')"] .category-icon {
         position: relative !important;
         overflow: hidden !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
     button.category-card[onclick="showView('aguaOvos')"] .category-icon::before {
         content: "🥥 🥚 🍯";
@@ -104,12 +111,6 @@ estiloOutros.textContent = `
         text-align: center;
         white-space: nowrap;
         line-height: 1;
-    }
-    button.category-card[onclick="showView('aguaOvos')"] .category-icon {
-        font-size: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
     }
     @media (min-width: 750px) {
         button.category-card[onclick="showView('aguaOvos')"] .category-icon::before {
@@ -123,67 +124,54 @@ estiloOutros.textContent = `
             letter-spacing: -0.08rem;
         }
     }
-
-    /* Domingo nunca pode ser escolhido como data de agendamento. */
     .date-input.sunday-disabled {
         border-color: var(--vermelho) !important;
         background: #fff5f5 !important;
     }
 `;
-document.head.appendChild(estiloOutros);
+document.head.appendChild(estilo);
 
-// Bloqueia domingo no seletor de data sem alterar as demais regras do agendamento.
-function configurarBloqueioDomingo() {
-    const input = document.getElementById("delivery-date");
-    if (!input || input.__domingoBloqueado) return;
-    input.__domingoBloqueado = true;
-
-    const validar = () => {
-        if (!input.value) return true;
-        const [ano, mes, dia] = input.value.split("-").map(Number);
-        const data = new Date(ano, mes - 1, dia);
-        if (data.getDay() === 0) {
-            input.value = "";
-            input.classList.add("sunday-disabled");
-            if (typeof window.selectedDeliveryDate !== "undefined") window.selectedDeliveryDate = "";
-            alert("Não é possível agendar para domingo. Domingo não temos atendimento.");
-            return false;
-        }
-        input.classList.remove("sunday-disabled");
-        return true;
-    };
-
-    input.addEventListener("change", validar);
-    input.addEventListener("input", validar);
-
-    // Impede que o valor de domingo seja enviado pelo pedido.
-    const originalOnChange = input.onchange;
-    input.onchange = function(event) {
-        if (!validar()) return false;
-        if (typeof originalOnChange === "function") return originalOnChange.call(this, event);
-    };
-
-    // Para a escolha pelo calendário, o próprio campo não consegue receber domingo.
-    input.addEventListener("blur", validar);
+// Domingo nunca pode ser uma data válida para agendamento.
+function dataEhDomingo(valor) {
+    if (!valor) return false;
+    const partes = String(valor).split("-").map(Number);
+    if (partes.length !== 3 || partes.some(Number.isNaN)) return false;
+    return new Date(partes[0], partes[1] - 1, partes[2]).getDay() === 0;
 }
 
-function pularDomingo(data) {
-    const d = new Date(data.getFullYear(), data.getMonth(), data.getDate());
-    while (d.getDay() === 0) d.setDate(d.getDate() + 1);
-    return d;
+function rejeitarDomingo(input) {
+    if (!input || !dataEhDomingo(input.value)) return true;
+    input.value = "";
+    input.classList.add("sunday-disabled");
+    try { input.dispatchEvent(new Event("change", { bubbles: true })); } catch (_) {}
+    return false;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    configurarBloqueioDomingo();
+function instalarBloqueioDomingo() {
+    // O campo atual pode mudar de id/classe conforme a tela; por isso
+    // localizamos qualquer input de data e também o id tradicional.
+    const procurar = () => {
+        const campos = [...document.querySelectorAll('input[type="date"], #delivery-date, .date-input')];
+        campos.forEach(input => {
+            if (input.__domingoInstalado) return;
+            input.__domingoInstalado = true;
 
-    const input = document.getElementById("delivery-date");
-    if (input) {
-        // Não permite que o calendário fique em domingo como data inicial.
-        const hoje = new Date();
-        const amanha = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + 1);
-        const primeiraDataValida = pularDomingo(amanha);
-        input.min = `${primeiraDataValida.getFullYear()}-${String(primeiraDataValida.getMonth() + 1).padStart(2, "0")}-${String(primeiraDataValida.getDate()).padStart(2, "0")}`;
-    }
-});
+            input.addEventListener("change", () => {
+                if (rejeitarDomingo(input)) input.classList.remove("sunday-disabled");
+            }, true);
+            input.addEventListener("input", () => {
+                if (rejeitarDomingo(input)) input.classList.remove("sunday-disabled");
+            }, true);
+            input.addEventListener("blur", () => rejeitarDomingo(input), true);
+        });
+    };
+
+    procurar();
+    const observer = new MutationObserver(procurar);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+}
+
+document.addEventListener("DOMContentLoaded", instalarBloqueioDomingo);
+if (document.readyState !== "loading") instalarBloqueioDomingo();
 
 export { app, auth, db, storage };

@@ -20,10 +20,13 @@ jobs:
           node --check pedidos/app.js
           node --check pedidos/admin.js
           node --check pedidos/order-engine.js
+          node --check pedidos/order-closed.js
       - name: Testar motor de pedidos
         run: node --experimental-default-type=module pedidos/order-engine.test.mjs
       - name: Conferir isolamento do Sistema de Agendamentos
         run: |
-          ! grep -R -F "../firebase.js" pedidos --include='*.js' --include='*.html'
-          ! grep -R -F "/api/" pedidos --include='*.js' --include='*.html'
-          ! grep -R -E "collection.*produtos|collection\(db, 'produtos'\)" pedidos --include='*.js'
+          if grep -R -F "../firebase.js" pedidos --include='*.js' --include='*.html'; then exit 1; fi
+          if grep -R -F "'/api/" pedidos --include='*.js' --include='*.html'; then exit 1; fi
+          if grep -R -F '"/api/' pedidos --include='*.js' --include='*.html'; then exit 1; fi
+          if grep -R -E "collection.*produtos|collection\(db, 'produtos'\)" pedidos --include='*.js'; then exit 1; fi
+          echo "Isolamento do sistema de pedidos: OK"

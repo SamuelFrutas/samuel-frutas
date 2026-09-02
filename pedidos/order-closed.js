@@ -8,9 +8,20 @@ import { PEDIDOS_CONFIG } from './config.js';
 const CLOSED_START = 13 * 60 + 30;
 const CLOSED_END = 20 * 60;
 
+function saoPauloMinutes() {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Sao_Paulo',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).formatToParts(new Date());
+  const hour = Number(parts.find(p => p.type === 'hour')?.value || 0);
+  const minute = Number(parts.find(p => p.type === 'minute')?.value || 0);
+  return hour * 60 + minute;
+}
+
 function scheduledClosed() {
-  const now = new Date();
-  const minutes = now.getHours() * 60 + now.getMinutes();
+  const minutes = saoPauloMinutes();
   return minutes >= CLOSED_START && minutes < CLOSED_END;
 }
 

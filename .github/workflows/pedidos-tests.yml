@@ -1,0 +1,48 @@
+name: Testes do Sistema de Pedidos
+
+on:
+  push:
+    branches: [migracao-pedidos-pages]
+  workflow_dispatch:
+
+jobs:
+  test-pedidos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validar sintaxe JavaScript
+        run: |
+          node --check pedidos/app.js
+          node --check pedidos/admin.js
+          node --check pedidos/order-engine.js
+          node --check pedidos/order-closed.js
+      - name: Testar motor de pedidos
+        run: node --experimental-default-type=module pedidos/order-engine.test.mjs
+      - name: Conferir isolamento do Sistema de Agendamentos
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const bad = [];
+          function walk(dir) {
+            for (const name of fs.readdirSync(dir)) {
+              const full = path.join(dir, name);
+              const st = fs.statSync(full);
+              if (st.isDirectory()) walk(full);
+              else if (/\.(js|html)$/.test(name)) {
+                const text = fs.readFileSync(full, 'utf8');
+                if (text.includes("../firebase.js")) bad.push(`${full}: firebase do Agendamentos`);
+                if (/['\"]\/api\//.test(text)) bad.push(`${full}: API antiga /api/`);
+                if (/collection\s*\([^)]*,\s*['\"]produtos['\"]/.test(text)) bad.push(`${full}: coleção produtos do Agendamentos`);
+              }
+            }
+          }
+          walk('pedidos');
+          if (bad.length) { console.error(bad.join('\n')); process.exit(1); }
+          console.log('Isolamento do sistema de pedidos: OK');
+          NODE

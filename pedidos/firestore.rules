@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Catálogo: leitura pública para a loja.
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // Configuração: leitura pública; alteração somente autenticada.
+    match /config/{configId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // Clientes podem criar pedidos; somente usuários autenticados podem consultar/alterar.
+    // Não existe escrita pública de atualização/exclusão.
+    match /orders/{orderId} {
+      allow create: if request.resource.data.keys().hasAll([
+        'orderId','items','subtotal','deliveryFee','total','scheduledFor','status','source'
+      ])
+      && request.resource.data.items is list
+      && request.resource.data.subtotal is number
+      && request.resource.data.deliveryFee is number
+      && request.resource.data.total is number;
+      allow read, update, delete: if request.auth != null;
+    }
+  }
+}

@@ -1,9 +1,0 @@
-import { listProducts, getConfig, createOrder } from './firebase-client.js';
-export async function loadCatalog(){const p=await listProducts();return p.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'pt-BR'))}
-export async function loadOrderConfig(){return getConfig()}
-function norm(u){return String(u||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
-export function factorOf(m){const q=Number(m?.quantity||m?.lotSize||1)||1,u=norm(m?.unit);if(u==='dz'||u==='duzia'||u==='duzias')return 12*q;if(u==='dezena'||u==='dezenas')return 10*q;if(u==='inteiro'||u==='inteira')return q;const f=String(m?.unit||'').match(/^(\d+(?:[.,]\d+)?)\s*\/\s*(\d+(?:[.,]\d+)?)$/);if(f){const a=Number(f[1].replace(',','.')),b=Number(f[2].replace(',','.'));if(a>0&&b>0)return q*(a/b)}return q}
-function round(v,m){const n=Number(v)||0;return norm(m?.unit)==='lote'?Math.ceil((n-1e-9)*2)/2:Math.ceil((n-1e-9)*10)/10}
-export function selectedTotal(p,c){const ms=Array.isArray(p?.measures)?p.measures.filter(m=>Number(m?.price||0)>0):[],sel=ms[Number(c?.measureIndex||0)]||ms[0],q=Number(c?.quantity||0);if(!sel||!q)return 0;const target=factorOf(sel)*q,exact=ms.filter(m=>Math.abs(factorOf(m)-target)<1e-9).sort((a,b)=>factorOf(b)-factorOf(a))[0];if(exact)return Number(exact.price);const lower=ms.filter(m=>factorOf(m)<=target+1e-9).sort((a,b)=>factorOf(b)-factorOf(a))[0];return lower?round(target*(Number(lower.price)/factorOf(lower)),lower):Number(sel.price)*q}
-export function deliveryFee(subtotal){if(subtotal>=50)return 0;if(subtotal>=20)return 3;return 5}
-export async function saveOrder({items,subtotal,deliveryFee:fee,total,scheduledFor,observations}){return createOrder({orderId:`WEB-${Date.now()}`,items,subtotal,deliveryFee:fee,total,scheduledFor:scheduledFor||null,observations:observations||'',status:'pending',source:'github-pages'})}

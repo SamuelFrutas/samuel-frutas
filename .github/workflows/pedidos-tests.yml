@@ -24,5 +24,6 @@ jobs:
         run: node --experimental-default-type=module pedidos/order-engine.test.mjs
       - name: Conferir isolamento do Sistema de Agendamentos
         run: |
-          ! grep -R "../firebase.js\|/api/" pedidos --include='*.js' --include='*.html'
-          ! grep -R "collection.*produtos\|collection(db, 'produtos')" pedidos --include='*.js'
+          ! grep -R -F "../firebase.js" pedidos --include='*.js' --include='*.html'
+          ! grep -R -F "/api/" pedidos --include='*.js' --include='*.html'
+          ! grep -R -E "collection.*produtos|collection\(db, 'produtos'\)" pedidos --include='*.js'

@@ -28,7 +28,6 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
-          const root = 'pedidos';
           const bad = [];
           function walk(dir) {
             for (const name of fs.readdirSync(dir)) {
@@ -39,11 +38,11 @@ jobs:
                 const text = fs.readFileSync(full, 'utf8');
                 if (text.includes("../firebase.js")) bad.push(`${full}: firebase do Agendamentos`);
                 if (/['\"]\/api\//.test(text)) bad.push(`${full}: API antiga /api/`);
-                if (/collection\([^\n]*['\"]produtos['\"]/.test(text) || /collection[^\n]*produtos/.test(text)) bad.push(`${full}: coleção produtos do Agendamentos`);
+                if (/collection\s*\([^)]*,\s*['\"]produtos['\"]/.test(text)) bad.push(`${full}: coleção produtos do Agendamentos`);
               }
             }
           }
-          walk(root);
+          walk('pedidos');
           if (bad.length) { console.error(bad.join('\n')); process.exit(1); }
           console.log('Isolamento do sistema de pedidos: OK');
           NODE

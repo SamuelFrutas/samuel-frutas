@@ -25,8 +25,25 @@ jobs:
         run: node --experimental-default-type=module pedidos/order-engine.test.mjs
       - name: Conferir isolamento do Sistema de Agendamentos
         run: |
-          if grep -R -F "../firebase.js" pedidos --include='*.js' --include='*.html'; then exit 1; fi
-          if grep -R -F "'/api/" pedidos --include='*.js' --include='*.html'; then exit 1; fi
-          if grep -R -F '"/api/' pedidos --include='*.js' --include='*.html'; then exit 1; fi
-          if grep -R -E "collection.*produtos|collection\(db, 'produtos'\)" pedidos --include='*.js'; then exit 1; fi
-          echo "Isolamento do sistema de pedidos: OK"
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const root = 'pedidos';
+          const bad = [];
+          function walk(dir) {
+            for (const name of fs.readdirSync(dir)) {
+              const full = path.join(dir, name);
+              const st = fs.statSync(full);
+              if (st.isDirectory()) walk(full);
+              else if (/\.(js|html)$/.test(name)) {
+                const text = fs.readFileSync(full, 'utf8');
+                if (text.includes("../firebase.js")) bad.push(`${full}: firebase do Agendamentos`);
+                if (/['\"]\/api\//.test(text)) bad.push(`${full}: API antiga /api/`);
+                if (/collection\([^\n]*['\"]produtos['\"]/.test(text) || /collection[^\n]*produtos/.test(text)) bad.push(`${full}: coleção produtos do Agendamentos`);
+              }
+            }
+          }
+          walk(root);
+          if (bad.length) { console.error(bad.join('\n')); process.exit(1); }
+          console.log('Isolamento do sistema de pedidos: OK');
+          NODE

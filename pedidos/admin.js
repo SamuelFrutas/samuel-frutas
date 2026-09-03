@@ -1,10 +1,10 @@
 import { auth, db } from './firebase.js';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
 import { PEDIDOS_CONFIG } from './config.js';
 
 const UNITS=['Un','Lote','Duplo','Dz','1/8','1/4','Bdj','Cx','1/2','GF','Inteiro'];
-let products=[];let archived=false;let editingId=null;let imagePreviewTimer=null;let previewUrl='';
+let products=[];let archived=false;let editingId=null;let imagePreviewTimer=null;let previewUrl='';let siteOffline=false;let stopSiteListener=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[c]));
 const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -43,12 +43,15 @@ function showForm(p=null){
   });
 }
 function hideForm(){editingId=null;clearTimeout(imagePreviewTimer);previewUrl='';$('form').classList.add('hidden');$('name').value='';$('image').value='';$('imagePreview').removeAttribute('src');$('imagePreview').alt='Pré-visualização da imagem';$('imagePreviewStatus').textContent='Cole a URL da imagem acima para visualizar.';$('imagePreviewWrap').classList.remove('has-error');$('imagePreviewWrap').classList.add('hidden')}
+function renderSiteToggle(){const b=$('siteToggle');if(!b)return;b.classList.toggle('offline',siteOffline);b.classList.toggle('online',!siteOffline);b.textContent=siteOffline?'Site: FORA DO AR':'Site: ONLINE';b.title=siteOffline?'Clique para colocar o site no ar':'Clique para colocar o site fora do ar';}
+function listenSiteStatus(){if(stopSiteListener)stopSiteListener();stopSiteListener=onSnapshot(doc(db,PEDIDOS_CONFIG.collections.config,'bot'),snap=>{siteOffline=Boolean(snap.data()?.siteOffline);renderSiteToggle()},()=>{siteOffline=false;renderSiteToggle()});}
+async function toggleSite(){const next=!siteOffline;siteOffline=next;renderSiteToggle();try{await setDoc(doc(db,PEDIDOS_CONFIG.collections.config,'bot'),{siteOffline:next,updatedAt:serverTimestamp()},{merge:true});}catch(e){siteOffline=!next;renderSiteToggle();alert('Não foi possível alterar o status do site.')}}
 $('measureRows').addEventListener('click',e=>{if(e.target.closest('.remove'))e.target.closest('.measure').remove()});
 $('addMeasure').onclick=()=>{$('measureRows').insertAdjacentHTML('beforeend',row())};
 $('image').addEventListener('input',scheduleImagePreview);
 $('image').addEventListener('change',updateImagePreview);
 $('image').addEventListener('paste',()=>setTimeout(updateImagePreview,50));
-$('newProduct').onclick=()=>showForm();$('cancel').onclick=hideForm;
+$('newProduct').onclick=()=>showForm();$('cancel').onclick=hideForm;$('siteToggle').onclick=toggleSite;
 $('save').onclick=async()=>{try{const name=$('name').value.trim();const measures=readMeasures();if(!name)throw Error('Informe o nome do produto.');if(!measures.length||!measures.some(m=>m.price>0))throw Error('Adicione pelo menos uma medida com preço.');const data={name,category:'produtos',measures,unit:measures[0].unit,price:measures[0].price,priceTiers:measures.filter(m=>m.unit===measures[0].unit&&m.quantity>1).map(m=>({minQty:m.quantity,unitPrice:m.price})),image:$('image').value.trim(),archived:false,updatedAt:serverTimestamp()};if(editingId)await updateDoc(doc(db,PEDIDOS_CONFIG.collections.products,editingId),data);else await addDoc(collection(db,PEDIDOS_CONFIG.collections.products),{...data,createdAt:serverTimestamp()});hideForm();await loadProducts();}catch(e){alert(e.message||'Não foi possível salvar o produto.')}};
 async function loadProducts(){const snap=await getDocs(collection(db,PEDIDOS_CONFIG.collections.products));products=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>Boolean(p.archived)===archived).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'pt-BR'));renderProducts();}
 function renderProducts(){$('products').innerHTML=products.length?products.map(p=>`<article class="product"><div class="product-head">${p.image?`<img class="thumb" src="${esc(p.image)}" loading="lazy" onerror="this.style.display='none'">`:''}<div><div class="name">${esc(p.name)}</div><div class="muted">${(p.measures||[]).map(m=>`${esc(m.quantity||1)} ${esc(m.unit||'Un')} — ${money(m.price)}`).join(' | ')||'Sem medidas'}</div></div></div><div class="actions" style="margin-top:10px"><button class="btn sec" data-edit="${p.id}">Editar</button>${archived?`<button class="btn" data-restore="${p.id}">Desarquivar</button><button class="btn danger" data-delete="${p.id}">Excluir</button>`:`<button class="btn danger" data-archive="${p.id}">Arquivar</button>`}</div></article>`).join(''):'<p class="muted">Nenhum produto nesta lista.</p>'}
@@ -57,5 +60,5 @@ $('activeTab').onclick=()=>{if(archived){archived=false;$('activeTab').className
 $('archivedTab').onclick=()=>{if(!archived){archived=true;$('activeTab').className='btn sec';$('archivedTab').className='btn';loadProducts()}};
 $('reload').onclick=loadProducts;
 $('loginBtn').onclick=async()=>{try{setMsg('Entrando...');await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value);setMsg('')}catch(e){setMsg(e.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':'Não foi possível entrar.')}};
-$('logout').onclick=()=>signOut(auth);
-onAuthStateChanged(auth,user=>{if(user){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('user').textContent=user.email||'';loadProducts()}else{$('login').classList.remove('hidden');$('app').classList.add('hidden')}});
+$('logout').onclick=()=>{if(stopSiteListener)stopSiteListener();signOut(auth)};
+onAuthStateChanged(auth,user=>{if(user){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('user').textContent=user.email||'';listenSiteStatus();loadProducts()}else{$('login').classList.remove('hidden');$('app').classList.add('hidden');if(stopSiteListener)stopSiteListener()}});

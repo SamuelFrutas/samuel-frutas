@@ -36,7 +36,9 @@ function showForm(p=null){
   updateImagePreview();
   $('measureRows').innerHTML=measureRows(p?.measures||[{quantity:1,unit:p?.unit||'Un',price:p?.price||0}]);
   requestAnimationFrame(()=>{
-    $('form').scrollIntoView({behavior:'smooth',block:'start'});
+    const scrollToForm=()=>window.scrollTo({top:Math.max(0,$('form').getBoundingClientRect().top+window.scrollY-12),behavior:'smooth'});
+    scrollToForm();
+    setTimeout(scrollToForm,80);
     if(!p)$('name').focus({preventScroll:true});
   });
 }

@@ -61,11 +61,3 @@ $('logout').onclick=()=>signOut(auth);
 onAuthStateChanged(auth,user=>{if(user){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('user').textContent=user.email||'';loadProducts();loadOrders()}else{$('login').classList.remove('hidden');$('app').classList.add('hidden')}});
 async function loadOrders(){try{const q=query(collection(db,PEDIDOS_CONFIG.collections.orders),orderBy('createdAt','desc'),limit(20));const snap=await getDocs(q);$('orders').innerHTML=snap.docs.map(d=>{const o=d.data();return `<article class="order"><strong>${esc(o.orderId||d.id)}</strong> <span class="muted">${esc(o.status||'')}</span><div class="muted">Total ${money(o.total)}</div><ul>${(o.items||[]).map(i=>`<li>${esc(i.quantity)} × ${esc(i.measureQuantity||1)} ${esc(i.unit||'')} — ${esc(i.name)} — ${money(i.total)}</li>`).join('')}</ul>${o.observations?.length?`<div class="muted">Obs.: ${o.observations.map(x=>esc(x.name)+': '+esc(x.observation)).join(' | ')}</div>`:''}</article>`}).join('')||'<p class="muted">Nenhum pedido encontrado.</p>'}catch(e){$('orders').innerHTML='<p class="muted">Não foi possível consultar os pedidos. Verifique as regras do Firestore.</p>'}}
 $('reloadOrders').onclick=loadOrders;
-
-// Garante que o convite de instalação seja fechado de forma definitiva ao tocar em "Agora não".
-document.addEventListener('click',e=>{
-  const button=e.target.closest('#installLater');
-  if(!button)return;
-  const prompt=document.getElementById('installPrompt');
-  if(prompt){prompt.classList.add('hidden');prompt.style.display='none';}
-});

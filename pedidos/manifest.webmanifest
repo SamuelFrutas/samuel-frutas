@@ -1,0 +1,24 @@
+{
+  "name": "Samuel Frutas — Painel de Pedidos",
+  "short_name": "Samuel Frutas",
+  "start_url": "./admin.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f5",
+  "theme_color": "#0f8a4b",
+  "description": "Painel administrativo do Sistema de Pedidos Samuel Frutas.",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

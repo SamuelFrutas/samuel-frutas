@@ -1,6 +1,6 @@
 import { auth, db } from './firebase.js';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, limit, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
 import { PEDIDOS_CONFIG } from './config.js';
 
 const UNITS=['Un','Lote','Duplo','Dz','1/8','1/4','Bdj','Cx','1/2','GF','Inteiro'];
@@ -58,6 +58,4 @@ $('archivedTab').onclick=()=>{if(!archived){archived=true;$('activeTab').classNa
 $('reload').onclick=loadProducts;
 $('loginBtn').onclick=async()=>{try{setMsg('Entrando...');await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value);setMsg('')}catch(e){setMsg(e.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':'Não foi possível entrar.')}};
 $('logout').onclick=()=>signOut(auth);
-onAuthStateChanged(auth,user=>{if(user){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('user').textContent=user.email||'';loadProducts();loadOrders()}else{$('login').classList.remove('hidden');$('app').classList.add('hidden')}});
-async function loadOrders(){try{const q=query(collection(db,PEDIDOS_CONFIG.collections.orders),orderBy('createdAt','desc'),limit(20));const snap=await getDocs(q);$('orders').innerHTML=snap.docs.map(d=>{const o=d.data();return `<article class="order"><strong>${esc(o.orderId||d.id)}</strong> <span class="muted">${esc(o.status||'')}</span><div class="muted">Total ${money(o.total)}</div><ul>${(o.items||[]).map(i=>`<li>${esc(i.quantity)} × ${esc(i.measureQuantity||1)} ${esc(i.unit||'')} — ${esc(i.name)} — ${money(i.total)}</li>`).join('')}</ul>${o.observations?.length?`<div class="muted">Obs.: ${o.observations.map(x=>esc(x.name)+': '+esc(x.observation)).join(' | ')}</div>`:''}</article>`}).join('')||'<p class="muted">Nenhum pedido encontrado.</p>'}catch(e){$('orders').innerHTML='<p class="muted">Não foi possível consultar os pedidos. Verifique as regras do Firestore.</p>'}}
-$('reloadOrders').onclick=loadOrders;
+onAuthStateChanged(auth,user=>{if(user){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('user').textContent=user.email||'';loadProducts()}else{$('login').classList.remove('hidden');$('app').classList.add('hidden')}});

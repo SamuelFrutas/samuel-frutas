@@ -10,8 +10,8 @@ const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'
 const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 function setMsg(t){$('loginMsg').textContent=t||''}
 function measureRows(ms=[]){return ms.length?ms.map(row).join(''):row({quantity:1,unit:'Un',price:0});}
-function row(m={quantity:1,unit:'Un',price:0}){const unit=esc(m.unit||'Un');return `<div class="measure"><input class="mq" type="number" min="1" step="1" value="${Number(m.quantity||m.lotSize||1)}" placeholder="Qtd"><select class="mu">${UNITS.map(u=>`<option ${u===m.unit?'selected':''}>${u}</option>`).join('')}</select><input class="mp" type="number" min="0" step="0.01" value="${Number(m.price||0)}" placeholder="Preço"><button class="btn danger remove">×</button></div>`}
-function readMeasures(){return [...document.querySelectorAll('#measures .measure')].map(r=>{const unit=r.querySelector('.mu').value;const quantity=Math.max(1,Number(r.querySelector('.mq').value||1));const price=Number(r.querySelector('.mp').value||0);return unit==='Lote'?{quantity,unit,price,lotSize:quantity}:{quantity,unit,price}}).filter(m=>Number.isFinite(m.price)&&m.price>=0)}
+function row(m={quantity:1,unit:'Un',price:0}){return `<div class="measure"><label class="measure-field"><span class="measure-label">Quantidade</span><input class="mq" type="number" min="1" step="1" value="${Number(m.quantity||m.lotSize||1)}" placeholder="Qtd"></label><label class="measure-field"><span class="measure-label">Unidade / medida</span><select class="mu">${UNITS.map(u=>`<option ${u===m.unit?'selected':''}>${u}</option>`).join('')}</select></label><label class="measure-field"><span class="measure-label">Preço</span><input class="mp" type="number" min="0" step="0.01" value="${Number(m.price||0)}" placeholder="0,00"></label><button class="btn danger remove" type="button" title="Remover medida" aria-label="Remover medida">×</button></div>`}
+function readMeasures(){return [...document.querySelectorAll('#measureRows .measure')].map(r=>{const unit=r.querySelector('.mu').value;const quantity=Math.max(1,Number(r.querySelector('.mq').value||1));const price=Number(r.querySelector('.mp').value||0);return unit==='Lote'?{quantity,unit,price,lotSize:quantity}:{quantity,unit,price}}).filter(m=>Number.isFinite(m.price)&&m.price>=0)}
 function updateImagePreview(){
   const input=$('image'),wrap=$('imagePreviewWrap'),img=$('imagePreview'),status=$('imagePreviewStatus');
   if(!input||!wrap||!img||!status)return;
@@ -23,10 +23,10 @@ function updateImagePreview(){
   img.onerror=()=>{img.removeAttribute('src');img.alt='Não foi possível carregar esta imagem';wrap.classList.add('has-error');status.textContent='Não foi possível carregar esta URL. Use a URL direta do arquivo da imagem (JPG, PNG, WEBP etc.).'};
   img.src=url;
 }
-function showForm(p=null){editingId=p?.id||null;$('form').classList.remove('hidden');$('formTitle').textContent=p?'Editar produto':'Novo produto';$('name').value=p?.name||'';$('image').value=p?.image||'';updateImagePreview();$('measures').innerHTML=measureRows(p?.measures||[{quantity:1,unit:p?.unit||'Un',price:p?.price||0}]);}
+function showForm(p=null){editingId=p?.id||null;$('form').classList.remove('hidden');$('formTitle').textContent=p?'Editar produto':'Novo produto';$('name').value=p?.name||'';$('image').value=p?.image||'';updateImagePreview();$('measureRows').innerHTML=measureRows(p?.measures||[{quantity:1,unit:p?.unit||'Un',price:p?.price||0}]);}
 function hideForm(){editingId=null;$('form').classList.add('hidden');$('name').value='';$('image').value='';$('imagePreview').removeAttribute('src');$('imagePreview').alt='Pré-visualização da imagem';$('imagePreviewStatus').textContent='Cole a URL da imagem acima para visualizar.';$('imagePreviewWrap').classList.remove('has-error');$('imagePreviewWrap').classList.add('hidden');}
-$('measures').addEventListener('click',e=>{if(e.target.closest('.remove'))e.target.closest('.measure').remove()});
-$('addMeasure').onclick=()=>{$('measures').insertAdjacentHTML('beforeend',row())};
+$('measureRows').addEventListener('click',e=>{if(e.target.closest('.remove'))e.target.closest('.measure').remove()});
+$('addMeasure').onclick=()=>{$('measureRows').insertAdjacentHTML('beforeend',row())};
 $('image').addEventListener('input',updateImagePreview);
 $('image').addEventListener('change',updateImagePreview);
 $('image').addEventListener('paste',()=>setTimeout(updateImagePreview,50));

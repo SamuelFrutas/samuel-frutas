@@ -735,7 +735,7 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 /* BUSCA FLUTUANTE — acessível durante a rolagem */
 .floating-search{
   position:fixed;
-  right:16px;
+  left:16px;
   bottom:88px;
   z-index:70;
   width:50px;

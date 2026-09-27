@@ -96,7 +96,7 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 
 .unit-hint{display:flex;align-items:center;justify-content:center;width:100%;margin:0 0 8px;padding:8px 6px;border-radius:10px;background:#fff0f0;border:2px solid #df3838;color:#c62828;font-size:11px;line-height:1.15;font-weight:950;letter-spacing:.3px;text-align:center;text-transform:uppercase}
 
-/* Categorias grandes com as fotos aprovadas */
+/* Categorias compactas: quatro na mesma linha */
 #cats .cat,
 #category-panel-list .category-option{
   background-image:url("./assets/categorias-aprovadas.jpg") !important;
@@ -104,56 +104,54 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   background-repeat:no-repeat !important;
   color:#fff !important;
   text-shadow:0 2px 5px rgba(0,0,0,.95);
-  border:2px solid transparent !important;
   position:relative;
   overflow:hidden;
 }
 .cats{
   display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:7px !important;
   overflow:visible !important;
-  padding:2px 0 14px !important;
-  margin-bottom:14px !important;
+  padding:2px 0 12px !important;
+  margin-bottom:12px !important;
 }
 #cats .cat{
   width:100% !important;
   min-width:0 !important;
-  height:145px !important;
-  padding:14px !important;
-  border-radius:20px !important;
+  height:92px !important;
+  padding:7px 4px !important;
+  border-radius:14px !important;
   display:flex !important;
   flex-direction:column !important;
   align-items:center !important;
   justify-content:flex-end !important;
-  box-shadow:0 9px 25px rgba(12,69,38,.16) !important;
+  box-shadow:0 6px 16px rgba(12,69,38,.14) !important;
 }
 #cats .cat::before,
 #category-panel-list .category-option::before{
   content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(0,0,0,0) 20%,rgba(0,0,0,.76) 100%);
+  background:linear-gradient(180deg,rgba(0,0,0,0) 18%,rgba(0,0,0,.78) 100%);
   pointer-events:none;
 }
 #cats .cat>* ,
 #category-panel-list .category-option>*{position:relative;z-index:1}
 #cats .cat span{display:none !important}
-#cats .cat b{font-size:16px !important;margin:0 !important;line-height:1.1}
-#cats .cat small{font-size:10px !important;margin-top:4px !important}
-#cats .cat:nth-child(1),#category-panel-list .category-option:nth-child(1){background-position:0% 0% !important;}
-#cats .cat:nth-child(2),#category-panel-list .category-option:nth-child(2){background-position:100% 0% !important;}
-#cats .cat:nth-child(3),#category-panel-list .category-option:nth-child(3){background-position:0% 100% !important;}
-#cats .cat:nth-child(4),#category-panel-list .category-option:nth-child(4){background-position:100% 100% !important;}
+#cats .cat b{font-size:10px !important;margin:0 !important;line-height:1.05 !important;text-align:center}
+#cats .cat small{font-size:7px !important;margin-top:2px !important;line-height:1 !important}
+#cats .cat:nth-child(1),#category-panel-list .category-option:nth-child(1){background-position:0% 0% !important}
+#cats .cat:nth-child(2),#category-panel-list .category-option:nth-child(2){background-position:100% 0% !important}
+#cats .cat:nth-child(3),#category-panel-list .category-option:nth-child(3){background-position:0% 100% !important}
+#cats .cat:nth-child(4),#category-panel-list .category-option:nth-child(4){background-position:100% 100% !important}
 #category-panel-list .category-option{min-height:115px;padding:14px;border-radius:18px;align-items:flex-end}
 #category-panel-list .category-option span{display:none !important}
 #category-panel-list .category-option b{font-size:13px}
 #category-panel-list .category-option small{font-size:9px;margin-top:4px}
 #cats .cat.active,#category-panel-list .category-option.active{background-color:transparent !important;border-color:#fff !important}
 @media(max-width:380px){
-  .cats{gap:9px !important}
-  #cats .cat{height:132px !important;border-radius:18px !important;padding:11px !important}
-  #cats .cat b{font-size:14px !important}
+  .cats{gap:5px !important}
+  #cats .cat{height:84px !important;border-radius:12px !important;padding:6px 2px !important}
+  #cats .cat b{font-size:9px !important}
+  #cats .cat small{font-size:6.5px !important}
 }
-@media(min-width:700px){
-  .cats{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px !important}
   #cats .cat{height:175px !important}
 }

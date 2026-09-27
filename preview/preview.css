@@ -705,13 +705,13 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 
 /* OVOS, AGUA DE COCO E MEL — nova foto */
 #cats .cat:nth-child(4){
-  background-image:url('./assets/categoria-agua-ovos-mel.jpg?v=1') !important;
+  background-image:url('./assets/categoria-agua-ovos-mel.jpg?v=2') !important;
   background-size:cover !important;
   background-position:center !important;
   background-repeat:no-repeat !important;
 }
 #category-panel-list .category-option:nth-child(4){
-  background-image:url('./assets/categoria-agua-ovos-mel.jpg?v=1') !important;
+  background-image:url('./assets/categoria-agua-ovos-mel.jpg?v=2') !important;
   background-size:cover !important;
   background-position:center !important;
   background-repeat:no-repeat !important;

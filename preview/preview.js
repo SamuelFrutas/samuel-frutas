@@ -324,6 +324,7 @@ function updateCart() {
   $("count").textContent = count;
   $("navcount").textContent = count;
   $("floatcount").textContent = count;
+  updateFloatingButtons();
   renderCart();
   renderProducts();
 }

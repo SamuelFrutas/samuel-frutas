@@ -1,0 +1,20 @@
+name: Validar nova experiência de pedido
+
+on:
+  push:
+    branches: ["novo-pedido-moderno"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  validate-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar JavaScript
+        run: node --check preview/preview.js
+      - name: Verificar arquivos da prévia
+        run: |
+          test -f preview/preview.html
+          test -f preview/preview.css
+          test -f preview/preview.js

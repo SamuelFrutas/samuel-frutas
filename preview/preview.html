@@ -1927,7 +1927,9 @@ button {
 
 </style>
 
-</head>
+<style>
+.hero-modern{margin:18px 0 20px;background:linear-gradient(135deg,#eaf7e9,#dff1df);border-radius:26px;padding:24px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}.hero-modern h2{font-size:1.75rem;line-height:1.12;color:#17351b;margin:7px 0}.hero-modern p{font-size:.82rem;color:#607d68;line-height:1.45}.hero-modern .eyebrow{color:#2e7d32;font-size:.7rem;font-weight:800;text-transform:uppercase}.hero-modern .hero-fruit{font-size:3rem;white-space:nowrap}.category-card{border:none;border-radius:20px;box-shadow:0 6px 20px rgba(0,0,0,.06)}.product-card,.cart-list,.section-box{border:none;border-radius:20px;box-shadow:0 6px 20px rgba(0,0,0,.06)}.primary-button,.whatsapp-button{border-radius:16px;min-height:54px}@media(min-width:640px){.hero-modern{padding:28px}.hero-modern h2{font-size:2.1rem}}
+</style></head>
 
 
 <body>
@@ -1993,7 +1995,7 @@ button {
 <section
     id="view-home"
     class="view active"
->
+><div class="hero-modern"><div><div class="eyebrow">🥬 Fresquinho todos os dias</div><h2>Faça seu pedido<br>do seu jeito.</h2><p>Escolha os produtos, monte sua sacola e envie pelo WhatsApp.</p></div><div class="hero-fruit">🍊🍌🍎</div></div>
 
     <div
         id="repeat-card"
@@ -2381,7 +2383,7 @@ button {
     <div class="section-box">
 
         <div class="section-box-title">
-            📅 Quando deseja receber?
+            🚚 Como você quer receber?
         </div>
 
 
@@ -2394,11 +2396,9 @@ button {
                 onclick="chooseNextDelivery()"
             >
 
-                <strong>
-                    🚚 Próxima entrega disponível
-                </strong>
+                <strong>🚚 Entrega</strong>
 
-                <span id="next-delivery-text"></span>
+                <span>Receber no endereço</span>
 
             </button>
 
@@ -2410,13 +2410,9 @@ button {
                 onclick="chooseCustomDelivery()"
             >
 
-                <strong>
-                    📅 Escolher outra data
-                </strong>
+                <strong>🏪 Retirada</strong>
 
-                <span>
-                    Selecione o dia desejado
-                </span>
+                <span>Buscar no local</span>
 
             </button>
 

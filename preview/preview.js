@@ -1,3 +1,11 @@
+document.addEventListener("DOMContentLoaded", () => {
+  $("floating-search").onclick = openFloatingSearch;
+  $("close-floating-search").onclick = closeFloatingSearch;
+  $("floating-search-input").oninput = applyFloatingSearch;
+  $("floating-search-input").onkeydown = event => {
+    if (event.key === "Escape") closeFloatingSearch();
+  };
+});
 import { db } from "../firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -429,6 +437,29 @@ function setOrderType(type) {
   $("delivery").classList.toggle("active", type === "Entrega");
   $("pickup").classList.toggle("active", type === "Retirada");
   $("addressbox").hidden = type !== "Entrega";
+}
+
+function openFloatingSearch() {
+  const box = $("floating-search-box");
+  box.classList.add("show");
+  box.setAttribute("aria-hidden", "false");
+  const input = $("floating-search-input");
+  input.value = $("search")?.value || "";
+  input.focus();
+}
+
+function closeFloatingSearch() {
+  const box = $("floating-search-box");
+  box.classList.remove("show");
+  box.setAttribute("aria-hidden", "true");
+}
+
+function applyFloatingSearch() {
+  const value = $("floating-search-input").value;
+  $("search").value = value;
+  currentCategory = "";
+  renderCategories();
+  renderProducts();
 }
 
 function openCart() {

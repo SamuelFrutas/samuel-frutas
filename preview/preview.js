@@ -155,11 +155,29 @@ async function loadProducts() {
 }
 
 function renderCategories() {
+  const categoryMarkup = Object.keys(products).map(key => {
+    const meta = CATEGORY_META[key];
+    return '<button class="category-option ' + (currentCategory === key ? "active" : "") + '" data-panel-category="' + key + '" type="button">' +
+      '<span>' + meta[1] + '</span><div><b>' + meta[0] + '</b><small>' + products[key].length + " item(ns)</small></div></button>";
+  }).join("");
+
+  $("category-panel-list").innerHTML = categoryMarkup;
+
   $("cats").innerHTML = Object.keys(products).map(key => {
     const meta = CATEGORY_META[key];
     return '<button class="cat ' + (currentCategory === key ? "active" : "") + '" data-category="' + key + '" type="button">' +
       '<span>' + meta[1] + '</span><b>' + meta[0] + '</b><small>' + products[key].length + " item(ns)</small></button>";
   }).join("");
+
+  document.querySelectorAll(".category-option").forEach(button => {
+    button.onclick = () => {
+      currentCategory = button.dataset.panelCategory;
+      closeCategorySheet();
+      renderCategories();
+      renderProducts();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+  });
 
   document.querySelectorAll(".cat").forEach(button => {
     button.onclick = () => {
@@ -294,6 +312,8 @@ function updateCart() {
   const count = Object.keys(cart).length;
   $("count").textContent = count;
   $("navcount").textContent = count;
+  $("floatcount").textContent = count;
+  $("floating-checkout").style.display = count ? "flex" : "none";
   renderCart();
   renderProducts();
 }
@@ -407,6 +427,17 @@ function openCart() {
   renderCart();
 }
 
+function openCategorySheet() {
+  renderCategories();
+  $("category-sheet").classList.add("show");
+  $("category-sheet").setAttribute("aria-hidden", "false");
+}
+
+function closeCategorySheet() {
+  $("category-sheet").classList.remove("show");
+  $("category-sheet").setAttribute("aria-hidden", "true");
+}
+
 function openCatalog() {
   $("cart").classList.remove("on");
   $("catalog").classList.add("on");
@@ -497,10 +528,10 @@ function setup() {
   $("bag").onclick = openCart;
   $("back").onclick = openCatalog;
   $("nav-home").onclick = openCatalog;
-  $("nav-cats").onclick = () => {
-    openCatalog();
-    $("search").focus();
-  };
+  $("nav-cats").onclick = openCategorySheet;
+  $("close-categories").onclick = closeCategorySheet;
+  $("category-sheet").querySelector(".category-shade").onclick = closeCategorySheet;
+  $("floating-checkout").onclick = openCart;
   $("nav-bag").onclick = openCart;
   $("nav-more").onclick = () => toast("Em breve");
 

@@ -108,6 +108,21 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   position:relative;
   overflow:hidden;
 }
+/* Categorias maiores para destacar as fotos */
+.cats{gap:12px;padding:4px 2px 12px;margin-bottom:14px}
+#cats .cat{
+  flex:0 0 148px;
+  width:148px;
+  min-width:148px;
+  height:112px;
+  padding:12px;
+  border-radius:19px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  box-shadow:0 8px 24px rgba(12,69,38,.12);
+}
 #cats .cat::before,
 #category-panel-list .category-option::before{
   content:"";position:absolute;inset:0;
@@ -117,11 +132,23 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 #cats .cat>* ,
 #category-panel-list .category-option>*{position:relative;z-index:1}
 #cats .cat span{display:none}
+#cats .cat b{font-size:13px;margin-top:0;line-height:1.1}
+#cats .cat small{font-size:9px;margin-top:4px}
 #cats .cat:nth-child(1),#category-panel-list .category-option:nth-child(1){background-position:0% 0%;}
 #cats .cat:nth-child(2),#category-panel-list .category-option:nth-child(2){background-position:100% 0%;}
 #cats .cat:nth-child(3),#category-panel-list .category-option:nth-child(3){background-position:0% 100%;}
 #cats .cat:nth-child(4),#category-panel-list .category-option:nth-child(4){background-position:100% 100%;}
-#category-panel-list .category-option{min-height:76px;}
+#category-panel-list .category-option{
+  min-height:105px;
+  padding:13px;
+  border-radius:17px;
+  align-items:flex-end;
+}
 #category-panel-list .category-option span{display:none}
+#category-panel-list .category-option b{font-size:12px}
+#category-panel-list .category-option small{font-size:9px;margin-top:4px}
 #cats .cat.active{background-color:transparent;border-color:#fff}
 #category-panel-list .category-option.active{background-color:transparent;border-color:#fff}
+@media(max-width:380px){
+  #cats .cat{flex-basis:136px;width:136px;min-width:136px;height:105px}
+}

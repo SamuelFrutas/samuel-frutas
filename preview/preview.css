@@ -244,3 +244,27 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   #category-panel-list .category-option{height:102px !important;min-height:102px !important;border-radius:16px !important}
   #category-panel-list .category-option b{font-size:12px !important}
 }
+
+/* Nomes das categorias mais visíveis no painel */
+#category-panel-list .category-option b{
+  font-size:16px !important;
+  line-height:1.12 !important;
+  font-weight:950 !important;
+  letter-spacing:-.15px !important;
+  color:#fff !important;
+  text-shadow:0 2px 5px rgba(0,0,0,.95) !important;
+}
+#category-panel-list .category-option small{
+  font-size:9px !important;
+  line-height:1.05 !important;
+  margin-top:4px !important;
+  color:rgba(255,255,255,.95) !important;
+}
+@media(max-width:380px){
+  #category-panel-list .category-option b{
+    font-size:14px !important;
+  }
+  #category-panel-list .category-option small{
+    font-size:8px !important;
+  }
+}

@@ -492,3 +492,52 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
     min-height:102px !important;
   }
 }
+
+
+/* CORREÇÃO RAIZ — imagem de Legumes como IMG real, sem background-image */
+#cats .cat .category-photo{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  margin:0 !important;
+  pointer-events:none !important;
+}
+#cats .cat::before{
+  z-index:1 !important;
+}
+#cats .cat b,#cats .cat small{
+  position:relative !important;
+  z-index:2 !important;
+}
+#category-panel-list .category-option .category-photo{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  margin:0 !important;
+  pointer-events:none !important;
+}
+#category-panel-list .category-option::before{
+  z-index:1 !important;
+}
+#category-panel-list .category-option div{
+  position:relative !important;
+  z-index:2 !important;
+}
+#category-panel-list .category-option:nth-child(2){
+  background-image:none !important;
+  background-color:#173b27 !important;
+  color:#fff !important;
+}
+#category-panel-list .category-option:nth-child(2) span{
+  display:none !important;
+}

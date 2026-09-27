@@ -110,3 +110,6 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   text-align:center;
   text-transform:uppercase;
 }
+
+.quantity-btn:disabled{opacity:.38;cursor:not-allowed;background:#eef2ef;color:#9aa8a0;box-shadow:none}
+.quantity-input.quantity-locked{color:#9aa8a0;cursor:not-allowed;background:#eef2ef}

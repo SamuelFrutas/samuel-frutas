@@ -3,6 +3,7 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/f
 
 const WHATSAPP_NUMBER = "5521972837869";
 const PRODUCTS_COLLECTION = "produtos";
+const ADDRESS_STORAGE_KEY = "samuel_frutas_endereco_entrega";
 
 let products = { frutas: [], legumes: [], verduras: [], aguaOvos: [] };
 let cart = {};
@@ -310,7 +311,7 @@ function renderCart() {
       '<div class="itemrow"><div class="iteminfo">' +
         '<div class="itemtitle"><b>' + escapeHtml(item.name) + '</b><span class="itemqty" data-edit="' + escapeHtml(key) + '">' +
           formatQty(item.quantity) + " " + escapeHtml(item.unit) + '</span></div>' +
-        '<div class="sub">Toque na quantidade para alterar</div>' +
+        '<div class="sub edit-hint">👆 TOQUE NA QUANTIDADE PARA ALTERAR</div>' +
         '<button class="obsbtn" data-obs="' + escapeHtml(key) + '" type="button">' +
           (item.obs ? "✎ Editar observação" : "＋ Adicionar observação deste item") + '</button>' +
         '<div class="obs" id="obs-' + escapeHtml(key) + '">' +
@@ -419,19 +420,56 @@ function toast(message) {
   window.setTimeout(() => element.classList.remove("show"), 1800);
 }
 
+function saveAddressData() {
+  const data = {
+    address: $("address").value.trim(),
+    building: $("building").value.trim(),
+    block: $("block").value.trim(),
+    apartment: $("apartment").value.trim()
+  };
+  localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadAddressData() {
+  try {
+    const data = JSON.parse(localStorage.getItem(ADDRESS_STORAGE_KEY) || "null");
+    if (!data) return;
+    $("address").value = data.address || "";
+    $("building").value = data.building || "";
+    $("block").value = data.block || "";
+    $("apartment").value = data.apartment || "";
+  } catch (error) {
+    console.warn("Endereço salvo inválido:", error);
+  }
+}
+
+function onlyNumbersInput(input) {
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\\D/g, "");
+  });
+}
+
 function sendOrder() {
   const items = Object.values(cart);
   const date = $("date").value;
   const address = $("address").value.trim();
+  const building = $("building").value.trim();
+  const block = $("block").value.trim();
+  const apartment = $("apartment").value.trim();
 
   if (!items.length) return toast("Sua sacola está vazia.");
   if (!date) return toast("Escolha a data.");
-  if (orderType === "Entrega" && !address) return toast("Informe o endereço.");
+  if (orderType === "Entrega") {
+    if (!address) return toast("Informe o endereço.");
+    if (!building) return toast("Informe o número do prédio.");
+    if (!apartment) return toast("Informe o número do apartamento.");
+    saveAddressData();
+  }
 
   const details = [];
-  if ($("building").value.trim()) details.push("Prédio: " + $("building").value.trim());
-  if ($("block").value.trim()) details.push("Bloco: " + $("block").value.trim());
-  if ($("apartment").value.trim()) details.push("Apartamento: " + $("apartment").value.trim());
+  if (building) details.push("Prédio: " + building);
+  if (block) details.push("Bloco: " + block);
+  if (apartment) details.push("Apartamento: " + apartment);
 
   let message = "🛒 *NOVO PEDIDO - SAMUEL FRUTAS*\n-----------------------------------\n\n";
   items.forEach(item => {
@@ -496,6 +534,11 @@ function setup() {
     String(tomorrow.getMonth() + 1).padStart(2, "0") + "-" +
     String(tomorrow.getDate()).padStart(2, "0");
 
+  ["building", "block", "apartment"].forEach(id => onlyNumbersInput($(id)));
+  ["address", "building", "block", "apartment"].forEach(id => {
+    $(id).addEventListener("change", saveAddressData);
+  });
+  loadAddressData();
   setOrderType("Entrega");
   updateCart();
   loadProducts();

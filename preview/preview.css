@@ -12,3 +12,72 @@
 .product{transition:transform .16s ease,box-shadow .16s ease}.product:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(12,69,38,.12)}
 .photo{background:linear-gradient(145deg,#f2faf5,#d9f0e2);border:1px solid #e4eee8}
 @media(max-width:380px){.qty{grid-template-columns:40px minmax(44px,1fr) 40px}.qty button{width:40px!important;min-width:40px!important;height:38px!important}.qty .qinput{height:38px!important;font-size:13px!important}}
+
+/* =========================================================
+   CONTROLE DE QUANTIDADE V10
+   Um único componente, sem depender das regras antigas .qty.
+========================================================= */
+.quantity-control{
+  display:grid;
+  grid-template-columns:46px minmax(48px,1fr) 46px;
+  align-items:center;
+  gap:6px;
+  width:100%;
+  min-height:52px;
+  padding:5px;
+  margin-top:8px;
+  background:#f1f6f3;
+  border:1px solid #dce8e1;
+  border-radius:14px;
+}
+.quantity-btn{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:46px!important;
+  height:42px!important;
+  min-width:46px!important;
+  min-height:42px!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid #d5e2da!important;
+  border-radius:10px!important;
+  font-size:26px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  font-family:Arial,sans-serif!important;
+  opacity:1!important;
+  visibility:visible!important;
+  overflow:visible!important;
+}
+.quantity-minus{
+  background:#fff!important;
+  color:var(--g)!important;
+}
+.quantity-plus{
+  background:var(--g)!important;
+  color:#fff!important;
+  border-color:var(--g)!important;
+  box-shadow:0 4px 10px rgba(8,115,61,.22)!important;
+}
+.quantity-input{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  height:42px!important;
+  margin:0!important;
+  padding:0 4px!important;
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  color:var(--ink)!important;
+  text-align:center!important;
+  font-size:14px!important;
+  font-weight:900!important;
+}
+.quantity-btn:active{transform:scale(.94)}
+@media(max-width:380px){
+  .quantity-control{grid-template-columns:40px minmax(42px,1fr) 40px;gap:5px}
+  .quantity-btn{width:40px!important;min-width:40px!important;height:38px!important;min-height:38px!important;font-size:23px!important}
+  .quantity-input{height:38px!important}
+}

@@ -374,14 +374,25 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   background-repeat:no-repeat !important;
 }
 
-/* Fotos aprovadas — quatro categorias principais */
+/* Fotos aprovadas — recorte exato das fotos, sem usar as faixas de texto da arte */
 #cats .cat,
 #category-panel-list .category-option{
   background-image:url("./assets/categorias-aprovadas.jpg") !important;
-  background-size:200% 200% !important;
   background-repeat:no-repeat !important;
 }
-#cats .cat:nth-child(1),#category-panel-list .category-option:nth-child(1){background-position:0% 0% !important}
-#cats .cat:nth-child(2),#category-panel-list .category-option:nth-child(2){background-position:100% 0% !important}
-#cats .cat:nth-child(3),#category-panel-list .category-option:nth-child(3){background-position:0% 100% !important}
-#cats .cat:nth-child(4),#category-panel-list .category-option:nth-child(4){background-position:100% 100% !important}
+/* Os cards principais são quadrados. O recorte abaixo transforma cada foto da arte 2x2 em uma imagem inteira. */
+#cats .cat{
+  background-size:212% 302% !important;
+}
+#cats .cat:nth-child(1){background-position:3.3% 2.6% !important}
+#cats .cat:nth-child(2){background-position:96.1% 2.6% !important}
+#cats .cat:nth-child(3){background-position:3.3% 71.4% !important}
+#cats .cat:nth-child(4){background-position:96.1% 71.4% !important}
+/* No painel, usa a mesma foto aprovada, sem mostrar o texto embutido da montagem. */
+#category-panel-list .category-option{
+  background-size:212% 302% !important;
+}
+#category-panel-list .category-option:nth-child(1){background-position:3.3% 2.6% !important}
+#category-panel-list .category-option:nth-child(2){background-position:96.1% 2.6% !important}
+#category-panel-list .category-option:nth-child(3){background-position:3.3% 71.4% !important}
+#category-panel-list .category-option:nth-child(4){background-position:96.1% 71.4% !important}

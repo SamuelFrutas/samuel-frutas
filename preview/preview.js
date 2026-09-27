@@ -1,34 +1,508 @@
 import { db } from "../firebase.js";
-import { collection,getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-const WA="5521972837869";let P={frutas:[],legumes:[],verduras:[],aguaOvos:[]},C={},U={},catNow=null,type="Entrega",editKey=null;
-const $=id=>document.getElementById(id),N=x=>String(x??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim(),num=x=>Number(String(x??"").replace(",","."))||0,fmt=x=>Number.isInteger(x)?String(x):String(x).replace(".",",");
-const META={frutas:["Frutas","🍎"],legumes:["Legumes","🥕"],verduras:["Verduras","🥬"],aguaOvos:["Água de coco e ovos","🥥"]};
-const esc=x=>String(x??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
-function normalizarTexto(v){return String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
-function category(c,nome=""){let value=normalizarTexto(c),name=normalizarTexto(nome);if(value.includes("agua de coco")||value.includes("ovos")||value.includes("ovo")||name.includes("agua de coco")||(name.includes("coco")&&name.includes("agua"))||name.includes("ovo"))return"aguaOvos";if(value==="legume"||value==="legumes"||value.includes("legume"))return"legumes";if(value==="verdura"||value==="verduras"||value.includes("verdura"))return"verduras";return"frutas"}
-function parseUnits(d){const u=d?.unidadesMedida||{},formas=d?.formasVenda||d?.formasDeVenda,units=[];const temForma=(nome,...alts)=>{if(u[nome]===true||formas?.[nome]===true)return true;if(Array.isArray(formas))return formas.some(v=>alts.some(a=>normalizarTexto(v)===normalizarTexto(a)||normalizarTexto(v).includes(normalizarTexto(a))));return false};if(u.unidade===true||d?.unidade===true||d?.un===true)units.push("UN");if(u.quilo===true||d?.quilo===true||d?.kg===true)units.push("KG");if(u.maco===true||d?.maco===true||d?.maço===true)units.push("MAÇO");if(u.duzia===true||d?.duzia===true||d?.dúzia===true)units.push("DÚZIA");if(u.lote===true||d?.lote===true){const q=parseInt(u.quantidadePorLote||d?.quantidadeLote||3,10);units.push(q>0?"LOTE C/"+q:"LOTE")}if(temForma("bdj","bdj","bandeja"))units.push("BDJ");if(temForma("umQuarto","1/4","¼","um quarto"))units.push("1/4");if(temForma("umOitavo","1/8","⅛","um oitavo"))units.push("1/8");if(temForma("metade","metade","1/2","½"))units.push("METADE");const old=d?.unidades||d?.units;if(Array.isArray(old))old.forEach(v=>{const t=String(v).trim().toUpperCase();if(t.includes("BDJ")||t.includes("BANDEJA"))units.push("BDJ");else if(t.includes("1/4")||t.includes("¼"))units.push("1/4");else if(t.includes("1/8")||t.includes("⅛"))units.push("1/8");else if(t.includes("METADE")||t.includes("1/2")||t.includes("½"))units.push("METADE");else units.push(t)});return [...new Set(units.length?units:["UN"])}
-function image(d){return d.imagemUrl||d.imagem||d.imageUrl||d.foto||d.image||d.icon||d.url||d.img||""}
-function find(id){return Object.values(P).flat().find(p=>p.id===id)}function K(id,u){return id+"::"+u}
-async function load(){try{
-window.collection=collection;window.getDocs=getDocs;
-const snap=await window.getDocs(window.collection(db,"produtos"));
-P={frutas:[],legumes:[],verduras:[],aguaOvos:[]};
-snap.forEach(d=>{let x=d.data();if((x.ativo??x.active??true)===false)return;let p={id:d.id,name:x.nome||x.name||"Produto",image:image(x),units:parseUnits(x)};P[category(x.categoria??x.category,p.name)].push(p)});
-renderCats();render()
-}catch(e){console.error("Preview produtos:",e);$("products").innerHTML="<div class=empty>Não foi possível carregar os produtos agora.</div>"}}
-function renderCats(){$("cats").innerHTML=Object.keys(P).map(k=>"<button class=cat data-cat="+k+" type=button><span>"+META[k][1]+"</span><b>"+META[k][0]+"</b><small>"+P[k].length+" item(ns)</small></button>").join("");document.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{catNow=b.dataset.cat;document.querySelectorAll(".cat").forEach(x=>x.classList.toggle("active",x===b));render()})}
-function card(p){let u=U[p.id]||p.units[0],q=C[K(p.id,u)]?.quantity||0,im=p.image?"<img src=\""+esc(p.image)+"\" alt=\""+esc(p.name)+"\" loading=lazy>":"🍏";return"<article class=product><div class=photo>"+im+"<button class=heart type=button>♡</button></div><h3>"+esc(p.name)+"</h3><p>Fresquinho e selecionado</p><div class=units>"+p.units.map(x=>"<button class='unit "+(x===u?"active":"")+"' data-id=\""+p.id+"\" data-unit=\""+x+"\">"+x+"</button>").join("")+"</div><div class="quantity-control"><button type="button" class="quantity-btn quantity-minus" aria-label="Diminuir quantidade" data-id=\""+p.id+"\" data-unit=\""+u+"\">−</button><input class="quantity-input" aria-label="Quantidade" data-id=\""+p.id+"\" data-unit=\""+u+"\" type=number min=0 step="+(N(u)==="kg"?.1:1)+" value="+q+"><button type="button" class="quantity-btn quantity-plus" aria-label="Aumentar quantidade" data-id=\""+p.id+"\" data-unit=\""+u+"\">＋</button></div></article>"}
-function render(){let q=N($("search").value),e=Object.entries(P);if(catNow)e=e.filter(x=>x[0]===catNow);if(q)e=e.map(x=>[x[0],x[1].filter(p=>N(p.name).includes(q))]).filter(x=>x[1].length);if(!e.length){$("products").innerHTML="<div class=empty>Nenhum produto encontrado.</div>";return}$("products").innerHTML=e.map(x=>"<section class=block><div class=blockhead><h2>"+META[x[0]][1]+" "+META[x[0]][0]+"</h2><button type=button>Ver todos ›</button></div><div class=grid>"+x[1].map(card).join("")+"</div></section>").join("");bind()}
-function setQty(id,u,v){let p=find(id),q=num(v);if(!p)return;q=N(u)==="kg"?Math.round(q*10)/10:Math.round(q);let k=K(id,u);if(q<=0)delete C[k];else C[k]={id:id,name:p.name,unit:u,quantity:q,obs:C[k]?.obs||""};U[id]=u;update()}
-function bind(){document.querySelectorAll(".unit").forEach(b=>b.onclick=()=>{U[b.dataset.id]=b.dataset.unit;render()});document.querySelectorAll(".quantity-input").forEach(i=>i.onchange=()=>setQty(i.dataset.id,i.dataset.unit,i.value));document.querySelectorAll(".quantity-plus").forEach(b=>b.onclick=()=>setQty(b.dataset.id,b.dataset.unit,(C[K(b.dataset.id,b.dataset.unit)]?.quantity||0)+(N(b.dataset.unit)==="kg"?.1:1)));document.querySelectorAll(".quantity-minus").forEach(b=>b.onclick=()=>setQty(b.dataset.id,b.dataset.unit,(C[K(b.dataset.id,b.dataset.unit)]?.quantity||0)-(N(b.dataset.unit)==="kg"?.1:1)))}
-function update(){let c=Object.keys(C).length;$("count").textContent=c;$("navcount").textContent=c;renderCart();render()}
-function renderCart(){let e=Object.entries(C);if(!e.length){$("cartlist").innerHTML="<div class=empty>Sua sacola está vazia.</div>";return}$("cartlist").innerHTML=e.map(([k,i])=>"<article class=item><div class=itemrow><div class=iteminfo><div class=itemtitle><b>"+esc(i.name)+"</b><span class=itemqty data-edit=\""+k+"\">"+fmt(i.quantity)+" "+i.unit+"</span></div><div class=sub>Toque na quantidade para alterar</div><button class=obsbtn data-obs=\""+k+"\">"+(i.obs?"✎ Editar observação":"＋ Adicionar observação deste item")+"</button><div class=obs id=\"obs-"+k+"\"><textarea id=\"oin-"+k+"\" placeholder=\"Ex.: bem madura, por favor\">"+esc(i.obs)+"</textarea><button class=saveobs data-save=\""+k+"\">Salvar observação</button></div></div><button class=remove data-remove=\""+k+"\">×</button></div></article>").join("");document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{delete C[b.dataset.remove];update()});document.querySelectorAll("[data-obs]").forEach(b=>b.onclick=()=>$( "obs-"+b.dataset.obs).classList.toggle("show"));document.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>{C[b.dataset.save].obs=$( "oin-"+b.dataset.save).value.trim();renderCart();toast("Observação salva")});document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openEdit(b.dataset.edit))}
-function openEdit(k){let i=C[k],p=find(i.id);editKey=k;$("mname").textContent=i.name;$("munit").innerHTML=(p?.units||[i.unit]).map(u=>"<option>"+u+"</option>").join("");$("munit").value=i.unit;$("mqty").value=i.quantity;$("modal").classList.add("show")}
-function closeEdit(){$("modal").classList.remove("show");editKey=null}
-function saveEdit(){if(!editKey)return;let o=C[editKey],u=$("munit").value,q=num($("mqty").value);q=N(u)==="kg"?Math.round(q*10)/10:Math.round(q);delete C[editKey];if(q>0)C[K(o.id,u)]={id:o.id,name:o.name,unit:u,quantity:q,obs:o.obs||""};U[o.id]=u;closeEdit();update()}
-function showCart(){$("catalog").classList.remove("on");$("cart").classList.add("on");scrollTo(0,0);renderCart()}
-function showCatalog(){$("cart").classList.remove("on");$("catalog").classList.add("on");scrollTo(0,0)}
-function setType(t){type=t;$("delivery").classList.toggle("active",t==="Entrega");$("pickup").classList.toggle("active",t==="Retirada");$("addressbox").style.display=t==="Entrega"?"block":"none"}
-function toast(t){let x=$("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1800)}
-function send(){let items=Object.values(C),d=$("date").value,a=$("address").value.trim();if(!items.length)return toast("Sua sacola está vazia");if(!d)return toast("Escolha a data");if(type==="Entrega"&&!a)return toast("Informe o endereço");let extra=[];if($("building").value.trim())extra.push("Prédio: "+$("building").value.trim());if($("block").value.trim())extra.push("Bloco: "+$("block").value.trim());if($("apartment").value.trim())extra.push("Apartamento: "+$("apartment").value.trim());let m="🛒 *NOVO PEDIDO - SAMUEL FRUTAS*\n-----------------------------------\n\n";items.forEach(i=>{m+="• *"+i.name+"*: "+fmt(i.quantity)+" "+i.unit+"\n";if(i.obs)m+="  _Obs: "+i.obs+"_\n"});m+="\n-----------------------------------\n📅 *Data:* "+d.split("-").reverse().join("/")+"\n🚚 *Tipo:* "+type+"\n";if(type==="Entrega"){m+="📍 *Endereço:* "+a+"\n";if(extra.length)m+="🏢 "+extra.join(" | ")+"\n"}let g=$("general").value.trim();if(g)m+="📝 *Observação geral:* "+g+"\n";window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(m),"_blank")}
-$("home").onclick=showCatalog;$("bag").onclick=showCart;$("back").onclick=showCatalog;$("nav-home").onclick=showCatalog;$("nav-bag").onclick=showCart;$("nav-cats").onclick=()=>{$("search").focus();scrollTo(0,0)};$("nav-more").onclick=()=>toast("Em breve");$("search").oninput=()=>{catNow=null;document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));render()};$("delivery").onclick=()=>setType("Entrega");$("pickup").onclick=()=>setType("Retirada");$("send").onclick=send;$("close").onclick=closeEdit;$("modal").querySelector(".shade").onclick=closeEdit;$("msave").onclick=saveEdit;$("mminus").onclick=()=>{$("mqty").value=Math.max(0,num($("mqty").value)-(N($("munit").value)==="kg"?.1:1))};$("mplus").onclick=()=>{$("mqty").value=num($("mqty").value)+(N($("munit").value)==="kg"?.1:1)};let d=new Date();d.setDate(d.getDate()+1);$("date").value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");setType("Entrega");load();
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const WHATSAPP_NUMBER = "5521972837869";
+const PRODUCTS_COLLECTION = "produtos";
+
+let products = { frutas: [], legumes: [], verduras: [], aguaOvos: [] };
+let cart = {};
+let selectedUnits = {};
+let currentCategory = "";
+let orderType = "Entrega";
+let editingKey = "";
+
+const $ = id => document.getElementById(id);
+const normalize = value => String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+const numberValue = value => Number(String(value ?? "").replace(",", ".")) || 0;
+const formatQty = value => Number.isInteger(value) ? String(value) : String(value).replace(".", ",");
+const escapeHtml = value => String(value ?? "")
+  .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+
+const CATEGORY_META = {
+  frutas: ["Frutas", "🍎"],
+  legumes: ["Legumes", "🥕"],
+  verduras: ["Verduras", "🥬"],
+  aguaOvos: ["Água de coco e ovos", "🥥"]
+};
+
+function normalizarCategoria(categoria, nome = "") {
+  const value = normalize(categoria);
+  const name = normalize(nome);
+
+  if (
+    value.includes("agua de coco") ||
+    value.includes("ovos") ||
+    value.includes("ovo") ||
+    name.includes("agua de coco") ||
+    (name.includes("coco") && name.includes("agua")) ||
+    name.includes("ovo")
+  ) return "aguaOvos";
+
+  if (value.includes("legume")) return "legumes";
+  if (value.includes("verdura")) return "verduras";
+  return "frutas";
+}
+
+function parseUnits(data) {
+  const u = data?.unidadesMedida || {};
+  const formas = data?.formasVenda || data?.formasDeVenda;
+  const units = [];
+
+  const hasForm = (name, ...alternatives) => {
+    if (u[name] === true || formas?.[name] === true) return true;
+    if (Array.isArray(formas)) {
+      return formas.some(value => {
+        const text = normalize(value);
+        return alternatives.some(alt => text === normalize(alt) || text.includes(normalize(alt)));
+      });
+    }
+    return false;
+  };
+
+  if (u.unidade === true || data?.unidade === true || data?.un === true) units.push("UN");
+  if (u.quilo === true || data?.quilo === true || data?.kg === true) units.push("KG");
+  if (u.maco === true || data?.maco === true || data?.maço === true) units.push("MAÇO");
+  if (u.duzia === true || data?.duzia === true || data?.dúzia === true) units.push("DÚZIA");
+  if (u.lote === true || data?.lote === true) {
+    const quantity = parseInt(u.quantidadePorLote || data?.quantidadeLote || 3, 10);
+    units.push(quantity > 0 ? "LOTE C/" + quantity : "LOTE");
+  }
+  if (hasForm("bdj", "bdj", "bandeja")) units.push("BDJ");
+  if (hasForm("umQuarto", "1/4", "¼", "um quarto")) units.push("1/4");
+  if (hasForm("umOitavo", "1/8", "⅛", "um oitavo")) units.push("1/8");
+  if (hasForm("metade", "metade", "1/2", "½")) units.push("METADE");
+
+  const oldUnits = data?.unidades || data?.units;
+  if (Array.isArray(oldUnits)) {
+    oldUnits.forEach(value => {
+      const text = String(value).trim().toUpperCase();
+      if (text.includes("BDJ") || text.includes("BANDEJA")) units.push("BDJ");
+      else if (text.includes("1/4") || text.includes("¼")) units.push("1/4");
+      else if (text.includes("1/8") || text.includes("⅛")) units.push("1/8");
+      else if (text.includes("METADE") || text.includes("1/2") || text.includes("½")) units.push("METADE");
+      else units.push(text);
+    });
+  }
+
+  return [...new Set(units.length ? units : ["UN"])];
+}
+
+function getImage(data) {
+  return data?.imagemUrl || data?.imagem || data?.imageUrl || data?.foto ||
+    data?.image || data?.icon || data?.url || data?.img || "";
+}
+
+function productById(id) {
+  return Object.values(products).flat().find(product => product.id === id);
+}
+
+function cartKey(id, unit) {
+  return id + "::" + unit;
+}
+
+function stepFor(unit) {
+  return normalize(unit) === "kg" ? 0.1 : 1;
+}
+
+function setStatus(message, kind = "") {
+  const box = $("load-status");
+  if (!box) return;
+  box.textContent = message;
+  box.className = "load-status " + kind;
+}
+
+async function loadProducts() {
+  setStatus("Carregando produtos…");
+  try {
+    const snapshot = await getDocs(collection(db, PRODUCTS_COLLECTION));
+
+    products = { frutas: [], legumes: [], verduras: [], aguaOvos: [] };
+
+    snapshot.forEach(docSnap => {
+      const data = docSnap.data();
+      const active = data.ativo !== undefined ? data.ativo :
+        (data.active !== undefined ? data.active : true);
+
+      if (!active) return;
+
+      const name = data.nome || data.name || "Produto";
+      const category = normalizarCategoria(data.categoria || data.category || "frutas", name);
+
+      products[category].push({
+        id: docSnap.id,
+        name,
+        image: getImage(data),
+        units: parseUnits(data)
+      });
+    });
+
+    Object.keys(products).forEach(key => {
+      products[key].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+    });
+
+    renderCategories();
+    renderProducts();
+    setStatus(snapshot.size + " produtos carregados.", "ok");
+  } catch (error) {
+    console.error("Samuel Frutas preview - Firebase:", error);
+    setStatus("Não foi possível carregar os produtos. Toque em Recarregar.", "error");
+    $("products").innerHTML =
+      '<div class="empty"><strong>Produtos não carregaram.</strong><br>Verifique a conexão e tente novamente.<br><button id="retry-load" class="retry" type="button">Recarregar</button></div>';
+    $("retry-load").onclick = loadProducts;
+  }
+}
+
+function renderCategories() {
+  $("cats").innerHTML = Object.keys(products).map(key => {
+    const meta = CATEGORY_META[key];
+    return '<button class="cat ' + (currentCategory === key ? "active" : "") + '" data-category="' + key + '" type="button">' +
+      '<span>' + meta[1] + '</span><b>' + meta[0] + '</b><small>' + products[key].length + " item(ns)</small></button>";
+  }).join("");
+
+  document.querySelectorAll(".cat").forEach(button => {
+    button.onclick = () => {
+      currentCategory = button.dataset.category;
+      renderCategories();
+      renderProducts();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+  });
+}
+
+function renderProduct(product) {
+  const unit = selectedUnits[product.id] || product.units[0] || "UN";
+  const key = cartKey(product.id, unit);
+  const quantity = cart[key]?.quantity || 0;
+  const image = product.image
+    ? '<img src="' + escapeHtml(product.image) + '" alt="' + escapeHtml(product.name) + '" loading="lazy">'
+    : '<span class="fallback-fruit">🍏</span>';
+
+  return '<article class="product">' +
+    '<div class="photo">' + image + '<button class="heart" type="button" aria-label="Favorito">♡</button></div>' +
+    '<h3>' + escapeHtml(product.name) + '</h3>' +
+    '<p>Fresquinho e selecionado</p>' +
+    '<div class="units">' +
+      product.units.map(option =>
+        '<button class="unit ' + (option === unit ? "active" : "") + '" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(option) + '" type="button">' +
+          escapeHtml(option) + '</button>'
+      ).join("") +
+    '</div>' +
+    '<div class="quantity-control">' +
+      '<button class="quantity-btn quantity-minus" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(unit) + '" type="button" aria-label="Diminuir quantidade">−</button>' +
+      '<input class="quantity-input" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(unit) + '" type="number" min="0" step="' + stepFor(unit) + '" value="' + quantity + '" inputmode="decimal" aria-label="Quantidade">' +
+      '<button class="quantity-btn quantity-plus" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(unit) + '" type="button" aria-label="Aumentar quantidade">+</button>' +
+    '</div>' +
+  '</article>';
+}
+
+function renderProducts() {
+  const search = normalize($("search")?.value);
+  let groups = Object.entries(products);
+
+  if (currentCategory) groups = groups.filter(([key]) => key === currentCategory);
+
+  if (search) {
+    groups = groups.map(([key, list]) => [key, list.filter(product => normalize(product.name).includes(search))])
+      .filter(([, list]) => list.length);
+  }
+
+  if (!groups.length) {
+    $("products").innerHTML = '<div class="empty">Nenhum produto encontrado.</div>';
+    return;
+  }
+
+  $("products").innerHTML = groups.map(([key, list]) => {
+    const meta = CATEGORY_META[key];
+    return '<section class="block"><div class="blockhead"><h2>' + meta[1] + " " + meta[0] +
+      '</h2><button class="see-all" data-see="' + key + '" type="button">Ver todos ›</button></div>' +
+      '<div class="grid">' + list.map(renderProduct).join("") + '</div></section>';
+  }).join("");
+
+  bindProductControls();
+}
+
+function bindProductControls() {
+  document.querySelectorAll(".unit").forEach(button => {
+    button.onclick = () => {
+      selectedUnits[button.dataset.id] = button.dataset.unit;
+      renderProducts();
+    };
+  });
+
+  document.querySelectorAll(".quantity-plus").forEach(button => {
+    button.onclick = event => {
+      event.preventDefault();
+      const unit = button.dataset.unit;
+      const current = cart[cartKey(button.dataset.id, unit)]?.quantity || 0;
+      setQuantity(button.dataset.id, unit, current + stepFor(unit));
+    };
+  });
+
+  document.querySelectorAll(".quantity-minus").forEach(button => {
+    button.onclick = event => {
+      event.preventDefault();
+      const unit = button.dataset.unit;
+      const current = cart[cartKey(button.dataset.id, unit)]?.quantity || 0;
+      setQuantity(button.dataset.id, unit, current - stepFor(unit));
+    };
+  });
+
+  document.querySelectorAll(".quantity-input").forEach(input => {
+    input.onchange = () => setQuantity(input.dataset.id, input.dataset.unit, input.value);
+    input.onkeydown = event => {
+      if (event.key === "Enter") input.blur();
+    };
+  });
+
+  document.querySelectorAll("[data-see]").forEach(button => {
+    button.onclick = () => {
+      currentCategory = button.dataset.see;
+      renderCategories();
+      renderProducts();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+  });
+}
+
+function setQuantity(id, unit, value) {
+  const product = productById(id);
+  if (!product) return;
+
+  let quantity = numberValue(value);
+  quantity = normalize(unit) === "kg" ? Math.round(quantity * 10) / 10 : Math.round(quantity);
+
+  const key = cartKey(id, unit);
+  if (quantity <= 0) {
+    delete cart[key];
+  } else {
+    cart[key] = {
+      id,
+      name: product.name,
+      unit,
+      quantity,
+      obs: cart[key]?.obs || ""
+    };
+  }
+
+  selectedUnits[id] = unit;
+  updateCart();
+}
+
+function updateCart() {
+  const count = Object.keys(cart).length;
+  $("count").textContent = count;
+  $("navcount").textContent = count;
+  renderCart();
+  renderProducts();
+}
+
+function renderCart() {
+  const items = Object.entries(cart);
+
+  if (!items.length) {
+    $("cartlist").innerHTML = '<div class="empty">Sua sacola está vazia.</div>';
+    return;
+  }
+
+  $("cartlist").innerHTML = items.map(([key, item]) =>
+    '<article class="item">' +
+      '<div class="itemrow"><div class="iteminfo">' +
+        '<div class="itemtitle"><b>' + escapeHtml(item.name) + '</b><span class="itemqty" data-edit="' + escapeHtml(key) + '">' +
+          formatQty(item.quantity) + " " + escapeHtml(item.unit) + '</span></div>' +
+        '<div class="sub">Toque na quantidade para alterar</div>' +
+        '<button class="obsbtn" data-obs="' + escapeHtml(key) + '" type="button">' +
+          (item.obs ? "✎ Editar observação" : "＋ Adicionar observação deste item") + '</button>' +
+        '<div class="obs" id="obs-' + escapeHtml(key) + '">' +
+          '<textarea id="oin-' + escapeHtml(key) + '" placeholder="Ex.: bem madura, por favor">' + escapeHtml(item.obs) + '</textarea>' +
+          '<button class="saveobs" data-save="' + escapeHtml(key) + '" type="button">Salvar observação</button>' +
+        '</div>' +
+      '</div><button class="remove" data-remove="' + escapeHtml(key) + '" type="button" aria-label="Remover">×</button></div>' +
+    '</article>'
+  ).join("");
+
+  document.querySelectorAll("[data-remove]").forEach(button => {
+    button.onclick = () => {
+      delete cart[button.dataset.remove];
+      updateCart();
+    };
+  });
+
+  document.querySelectorAll("[data-obs]").forEach(button => {
+    button.onclick = () => $("obs-" + button.dataset.obs).classList.toggle("show");
+  });
+
+  document.querySelectorAll("[data-save]").forEach(button => {
+    button.onclick = () => {
+      const item = cart[button.dataset.save];
+      if (!item) return;
+      item.obs = $("oin-" + button.dataset.save).value.trim();
+      renderCart();
+      toast("Observação salva");
+    };
+  });
+
+  document.querySelectorAll("[data-edit]").forEach(button => {
+    button.onclick = () => openEdit(button.dataset.edit);
+  });
+}
+
+function openEdit(key) {
+  const item = cart[key];
+  const product = productById(item?.id);
+  if (!item) return;
+
+  editingKey = key;
+  $("mname").textContent = item.name;
+  $("munit").innerHTML = (product?.units || [item.unit]).map(unit =>
+    '<option value="' + escapeHtml(unit) + '">' + escapeHtml(unit) + "</option>"
+  ).join("");
+  $("munit").value = item.unit;
+  $("mqty").value = item.quantity;
+  $("modal").classList.add("show");
+}
+
+function closeEdit() {
+  $("modal").classList.remove("show");
+  editingKey = "";
+}
+
+function saveEdit() {
+  if (!editingKey || !cart[editingKey]) return;
+
+  const old = cart[editingKey];
+  const unit = $("munit").value;
+  let quantity = numberValue($("mqty").value);
+  quantity = normalize(unit) === "kg" ? Math.round(quantity * 10) / 10 : Math.round(quantity);
+
+  delete cart[editingKey];
+
+  if (quantity > 0) {
+    cart[cartKey(old.id, unit)] = {
+      id: old.id,
+      name: old.name,
+      unit,
+      quantity,
+      obs: old.obs || ""
+    };
+  }
+
+  selectedUnits[old.id] = unit;
+  closeEdit();
+  updateCart();
+}
+
+function setOrderType(type) {
+  orderType = type;
+  $("delivery").classList.toggle("active", type === "Entrega");
+  $("pickup").classList.toggle("active", type === "Retirada");
+  $("addressbox").hidden = type !== "Entrega";
+}
+
+function openCart() {
+  $("catalog").classList.remove("on");
+  $("cart").classList.add("on");
+  window.scrollTo(0, 0);
+  renderCart();
+}
+
+function openCatalog() {
+  $("cart").classList.remove("on");
+  $("catalog").classList.add("on");
+  window.scrollTo(0, 0);
+}
+
+function toast(message) {
+  const element = $("toast");
+  element.textContent = message;
+  element.classList.add("show");
+  window.setTimeout(() => element.classList.remove("show"), 1800);
+}
+
+function sendOrder() {
+  const items = Object.values(cart);
+  const date = $("date").value;
+  const address = $("address").value.trim();
+
+  if (!items.length) return toast("Sua sacola está vazia.");
+  if (!date) return toast("Escolha a data.");
+  if (orderType === "Entrega" && !address) return toast("Informe o endereço.");
+
+  const details = [];
+  if ($("building").value.trim()) details.push("Prédio: " + $("building").value.trim());
+  if ($("block").value.trim()) details.push("Bloco: " + $("block").value.trim());
+  if ($("apartment").value.trim()) details.push("Apartamento: " + $("apartment").value.trim());
+
+  let message = "🛒 *NOVO PEDIDO - SAMUEL FRUTAS*\n-----------------------------------\n\n";
+  items.forEach(item => {
+    message += "• *" + item.name + "*: " + formatQty(item.quantity) + " " + item.unit + "\n";
+    if (item.obs) message += "  _Obs: " + item.obs + "_\n";
+  });
+
+  message += "\n-----------------------------------\n";
+  message += "📅 *Data:* " + date.split("-").reverse().join("/") + "\n";
+  message += "🚚 *Tipo:* " + orderType + "\n";
+
+  if (orderType === "Entrega") {
+    message += "📍 *Endereço:* " + address + "\n";
+    if (details.length) message += "🏢 " + details.join(" | ") + "\n";
+  }
+
+  const general = $("general").value.trim();
+  if (general) message += "📝 *Observação geral:* " + general + "\n";
+
+  window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message), "_blank");
+}
+
+function setup() {
+  $("home").onclick = openCatalog;
+  $("bag").onclick = openCart;
+  $("back").onclick = openCatalog;
+  $("nav-home").onclick = openCatalog;
+  $("nav-cats").onclick = () => {
+    openCatalog();
+    $("search").focus();
+  };
+  $("nav-bag").onclick = openCart;
+  $("nav-more").onclick = () => toast("Em breve");
+
+  $("search").oninput = () => {
+    currentCategory = "";
+    renderCategories();
+    renderProducts();
+  };
+
+  $("delivery").onclick = () => setOrderType("Entrega");
+  $("pickup").onclick = () => setOrderType("Retirada");
+  $("send").onclick = sendOrder;
+
+  $("close").onclick = closeEdit;
+  $("modal").querySelector(".shade").onclick = closeEdit;
+  $("msave").onclick = saveEdit;
+
+  $("mminus").onclick = () => {
+    const unit = $("munit").value;
+    $("mqty").value = Math.max(0, numberValue($("mqty").value) - stepFor(unit));
+  };
+
+  $("mplus").onclick = () => {
+    const unit = $("munit").value;
+    $("mqty").value = numberValue($("mqty").value) + stepFor(unit);
+  };
+
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  $("date").value = tomorrow.getFullYear() + "-" +
+    String(tomorrow.getMonth() + 1).padStart(2, "0") + "-" +
+    String(tomorrow.getDate()).padStart(2, "0");
+
+  setOrderType("Entrega");
+  updateCart();
+  loadProducts();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", setup);
+} else {
+  setup();
+}

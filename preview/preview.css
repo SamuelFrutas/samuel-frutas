@@ -95,3 +95,20 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 .quantity-btn:disabled{opacity:.38;cursor:not-allowed;background:#eef2ef;color:#9aa8a0;box-shadow:none}.quantity-input.quantity-locked{color:#9aa8a0;cursor:not-allowed;background:#eef2ef}
 
 .unit-hint{display:flex;align-items:center;justify-content:center;width:100%;margin:0 0 8px;padding:8px 6px;border-radius:10px;background:#fff0f0;border:2px solid #df3838;color:#c62828;font-size:11px;line-height:1.15;font-weight:950;letter-spacing:.3px;text-align:center;text-transform:uppercase}
+
+/* Imagens das categorias */
+#cats .cat:nth-child(1),#category-panel-list .category-option:nth-child(1){background-image:url("./assets/categoria-frutas.svg");}
+#cats .cat:nth-child(2),#category-panel-list .category-option:nth-child(2){background-image:url("./assets/categoria-legumes.svg");}
+#cats .cat:nth-child(3),#category-panel-list .category-option:nth-child(3){background-image:url("./assets/categoria-verduras.svg");}
+#cats .cat:nth-child(4),#category-panel-list .category-option:nth-child(4){background-image:url("./assets/categoria-agua-ovos-mel.svg");}
+#cats .cat{min-width:128px;height:92px;padding:0 8px 8px;display:flex;flex-direction:column;justify-content:flex-end;background-size:cover;background-position:center;color:#fff;border-color:transparent;position:relative;overflow:hidden;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+#cats .cat::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.78) 100%);pointer-events:none}
+#cats .cat>*{position:relative;z-index:1}
+#cats .cat span{display:none}
+#cats .cat b{font-size:11px;color:#fff;margin-top:0}
+#cats .cat small{font-size:8px;color:#fff;opacity:.9;margin-top:2px}
+#category-panel-list .category-option{min-height:76px;background-size:cover;background-position:center;color:#fff;border-color:transparent;position:relative;overflow:hidden;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+#category-panel-list .category-option::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.78) 100%);pointer-events:none}
+#category-panel-list .category-option>*{position:relative;z-index:1}
+#category-panel-list .category-option span{display:none}
+#category-panel-list .category-option b,#category-panel-list .category-option small{color:#fff}

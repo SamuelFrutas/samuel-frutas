@@ -147,7 +147,7 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   margin-top:2px !important;
 }
 #cats .cat:nth-child(1){background-image:url('./assets/categoria-frutas.jpg') !important;background-size:cover !important;background-position:center !important}
-#cats .cat:nth-child(2){background-position:100% 0% !important}
+#cats .cat:nth-child(2){background-image:url('./assets/categoria-legumes.jpg') !important;background-size:cover !important;background-position:center !important;background-repeat:no-repeat !important}
 #cats .cat:nth-child(3){background-position:0% 100% !important}
 #cats .cat:nth-child(4){background-position:100% 100% !important}
 #cats .cat.active{border:2px solid #fff !important}
@@ -165,7 +165,7 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 #category-panel-list .category-option>*{position:relative;z-index:1}
 #category-panel-list .category-option span{display:none !important}
 #category-panel-list .category-option:nth-child(1){background-image:url('./assets/categoria-frutas.jpg') !important;background-size:cover !important;background-position:center !important}
-#category-panel-list .category-option:nth-child(2){background-position:100% 0% !important}
+#category-panel-list .category-option:nth-child(2){background-image:none !important}
 #category-panel-list .category-option:nth-child(3){background-position:0% 100% !important}
 #category-panel-list .category-option:nth-child(4){background-position:100% 100% !important}
 @media(min-width:700px){

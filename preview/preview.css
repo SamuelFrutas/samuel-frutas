@@ -91,3 +91,7 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 .category-option b{font-size:11px;line-height:1.2}.category-option small{display:block;color:var(--muted);font-size:8px;margin-top:3px}
 @media(max-width:380px){.floating-checkout{right:10px;bottom:78px}.floating-checkout b{font-size:10px}.floating-checkout small{font-size:7px}}
 @media(min-width:700px){.floating-checkout{right:max(20px,calc((100% - 960px)/2));bottom:24px}.category-panel{bottom:20px;border-radius:24px}.category-shade{background:rgba(6,28,16,.32)}}
+
+.quantity-btn:disabled{opacity:.38;cursor:not-allowed;background:#eef2ef;color:#9aa8a0;box-shadow:none}.quantity-input.quantity-locked{color:#9aa8a0;cursor:not-allowed;background:#eef2ef}
+
+.unit-hint{display:flex;align-items:center;justify-content:center;width:100%;margin:0 0 8px;padding:8px 6px;border-radius:10px;background:#fff0f0;border:2px solid #df3838;color:#c62828;font-size:11px;line-height:1.15;font-weight:950;letter-spacing:.3px;text-align:center;text-transform:uppercase}

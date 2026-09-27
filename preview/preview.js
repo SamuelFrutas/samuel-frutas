@@ -190,10 +190,9 @@ function renderCategories() {
 }
 
 function renderProduct(product) {
-  const hasMultipleUnits = product.units.length > 1;
-  const unit = selectedUnits[product.id] || (hasMultipleUnits ? "" : (product.units[0] || "UN"));
-  const key = unit ? cartKey(product.id, unit) : "";
-  const quantity = unit ? (cart[key]?.quantity || 0) : 0;
+  const unit = selectedUnits[product.id] || product.units[0] || "UN";
+  const key = cartKey(product.id, unit);
+  const quantity = cart[key]?.quantity || 0;
   const image = product.image
     ? '<img src="' + escapeHtml(product.image) + '" alt="' + escapeHtml(product.name) + '" loading="lazy">'
     : '<span class="fallback-fruit">🍏</span>';
@@ -201,7 +200,7 @@ function renderProduct(product) {
   return '<article class="product">' +
     '<div class="photo">' + image + '<button class="heart" type="button" aria-label="Favorito">♡</button></div>' +
     '<h3>' + escapeHtml(product.name) + '</h3>' +
-    (hasMultipleUnits ? '<p class="unit-hint">⚠️ SELECIONE A UNIDADE DE MEDIDA</p>' : '') +
+    '<p>Fresquinho e selecionado</p>' +
     '<div class="units">' +
       product.units.map(option =>
         '<button class="unit ' + (option === unit ? "active" : "") + '" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(option) + '" type="button">' +
@@ -209,9 +208,9 @@ function renderProduct(product) {
       ).join("") +
     '</div>' +
     '<div class="quantity-control">' +
-      '<button class="quantity-btn quantity-minus" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(unit) + '" type="button" aria-label="Diminuir quantidade"' + (!unit ? ' disabled' : '') + '>−</button>' +
-      '<input class="quantity-input' + (!unit ? ' quantity-locked' : '') + '" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(unit) + '" type="number" min="0" step="' + (unit ? stepFor(unit) : 1) + '" value="' + quantity + '" inputmode="decimal" aria-label="Quantidade"' + (!unit ? ' disabled placeholder="Escolha a unidade"' : '') + '>' +
-      '<button class="quantity-btn quantity-plus" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(unit) + '" type="button" aria-label="Aumentar quantidade"' + (!unit ? ' disabled' : '') + '>+</button>' +
+      '<button class="quantity-btn quantity-minus" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(unit) + '" type="button" aria-label="Diminuir quantidade">−</button>' +
+      '<input class="quantity-input" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(unit) + '" type="number" min="0" step="' + stepFor(unit) + '" value="' + quantity + '" inputmode="decimal" aria-label="Quantidade">' +
+      '<button class="quantity-btn quantity-plus" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(unit) + '" type="button" aria-label="Aumentar quantidade">+</button>' +
     '</div>' +
   '</article>';
 }
@@ -254,10 +253,6 @@ function bindProductControls() {
     button.onclick = event => {
       event.preventDefault();
       const unit = button.dataset.unit;
-      if (!unit) {
-        showToast("Selecione primeiro a unidade de medida.");
-        return;
-      }
       const current = cart[cartKey(button.dataset.id, unit)]?.quantity || 0;
       setQuantity(button.dataset.id, unit, current + stepFor(unit));
     };
@@ -267,21 +262,13 @@ function bindProductControls() {
     button.onclick = event => {
       event.preventDefault();
       const unit = button.dataset.unit;
-      if (!unit) return;
       const current = cart[cartKey(button.dataset.id, unit)]?.quantity || 0;
       setQuantity(button.dataset.id, unit, current - stepFor(unit));
     };
   });
 
   document.querySelectorAll(".quantity-input").forEach(input => {
-    input.onchange = () => {
-      if (!input.dataset.unit) {
-        input.value = 0;
-        showToast("Selecione primeiro a unidade de medida.");
-        return;
-      }
-      setQuantity(input.dataset.id, input.dataset.unit, input.value);
-    };
+    input.onchange = () => setQuantity(input.dataset.id, input.dataset.unit, input.value);
     input.onkeydown = event => {
       if (event.key === "Enter") input.blur();
     };

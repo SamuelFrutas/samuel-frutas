@@ -268,3 +268,23 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
     font-size:8px !important;
   }
 }
+
+/* Nomes maiores nas quatro categorias da tela principal */
+#cats .cat b{
+  font-size:13px !important;
+  line-height:1.08 !important;
+  font-weight:950 !important;
+  letter-spacing:-.1px !important;
+  color:#fff !important;
+  text-shadow:0 2px 5px rgba(0,0,0,.98) !important;
+}
+#cats .cat small{
+  font-size:8px !important;
+  line-height:1 !important;
+  font-weight:800 !important;
+  margin-top:3px !important;
+}
+@media(max-width:380px){
+  #cats .cat b{font-size:12px !important}
+  #cats .cat small{font-size:7px !important}
+}

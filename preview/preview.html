@@ -1,5 +1,129 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#075b2b"><title>Samuel Frutas — Nova experiência</title><link rel="stylesheet" href="preview.css"></head><body><header class="topbar"><div class="brand"><span class="brand-mark">🍃</span><div><strong>Samuel Frutas</strong><small>Frutas, legumes, verduras e muito mais!</small></div></div><button class="cart-top" onclick="openCart()">🛒 <b id="cartCount">0</b></button></header><main id="app">
-<section id="homeView" class="view active"><div class="hero"><div><span>Frescor todos os dias</span><h1>Qualidade que chega até você.</h1></div></div><div class="search"><span>⌕</span><input id="homeSearch" placeholder="Buscar produtos..." oninput="searchProducts(this.value)"></div><div class="chips" id="categoryChips"></div><div class="section-head"><h2>Mais pedidos</h2><button onclick="showProducts()">Ver todos</button></div><div id="featured" class="featured"></div></section>
-<section id="productsView" class="view"><div class="section-title"><button onclick="goHome()">‹</button><div><small>Catálogo</small><h2 id="productsTitle">Frutas</h2></div><button onclick="openCart()">🛒</button></div><div class="search"><span>⌕</span><input id="productSearch" placeholder="Buscar frutas..." oninput="searchProducts(this.value)"></div><div id="productList" class="product-list"></div></section>
-<section id="cartView" class="view"><div class="section-title"><button onclick="showProducts()">‹</button><div><small>Seu pedido</small><h2>Minha sacola</h2></div></div><div id="cartList"></div><div class="cart-bottom"><strong id="cartSummary">0 itens</strong><button class="primary" onclick="openCheckout()">Continuar</button></div></section>
-<section id="checkoutView" class="view"><div class="section-title"><button onclick="openCart()">‹</button><div><small>Última etapa</small><h2>Finalizar pedido</h2></div></div><div class="card"><label>Tipo de pedido</label><div class="choice-row"><button id="deliveryChoice" class="choice selected" onclick="setOrderType('Entrega')">🚚 <b>Entrega</b><small>Receber no endereço</small></button><button id="pickupChoice" class="choice" onclick="setOrderType('Retirada')">🏪 <b>Retirada</b><small>Buscar no local</small></button></div></div><div class="card"><label>Data da entrega</label><input id="deliveryDate" type="date"></div><div id="addressCard" class="card"><label>Endereço da entrega</label><input id="address" placeholder="Prédio / Bloco / Apartamento"><small class="hint">Ex.: Bloco B, Apto 101</small></div><div class="card"><label>Observação geral do pedido <span>(opcional)</span></label><textarea id="generalObs" maxlength="300" placeholder="Alguma preferência ou outra observação..."></textarea></div><div class="notice">ℹ️ Ao finalizar, o pedido será aberto no seu WhatsApp já preenchido.</div><button class="primary whatsapp" onclick="finishOrder()">◉ Finalizar pedido<br><small>Enviar por WhatsApp</small></button></section></main><nav class="bottom-nav"><button class="active" onclick="goHome()">⌂<span>Início</span></button><button onclick="showProducts()">▦<span>Produtos</span></button><button onclick="openCart()">🛒<span>Sacola</span><i id="navBadge">0</i></button></nav><script type="module" src="preview.js"></script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2E7D32">
+<title>Samuel Frutas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="preview.css">
+<script type="module">
+import { db } from "../firebase.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+window.db = db;
+window.collection = collection;
+window.getDocs = getDocs;
+window.firebaseReady = true;
+window.dispatchEvent(new Event("firebase-ready"));
+</script>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <button class="brand" onclick="goHome()" aria-label="Início">
+      <span class="brand-icon">🍃</span>
+      <span><strong>Samuel Frutas</strong><small>Fresquinho para você</small></span>
+    </button>
+    <button class="header-cart" onclick="openCart()" aria-label="Abrir sacola">
+      <span>🛍️</span><b id="cartCount">0</b>
+    </button>
+  </div>
+</header>
+
+<main>
+<section id="homeView" class="view active">
+  <div class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">🥬 Qualidade todos os dias</span>
+      <h1>Faça seu pedido<br><em>do seu jeito.</em></h1>
+      <p>Escolha seus produtos, monte sua sacola e envie pelo WhatsApp.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true">🍊🍌🍎</div>
+  </div>
+
+  <div class="search-box">
+    <span>⌕</span>
+    <input id="homeSearch" type="search" placeholder="Buscar produtos..." oninput="searchProducts(this.value)">
+  </div>
+
+  <div id="categoryChips" class="category-row"></div>
+
+  <div class="section-head">
+    <div><span>Escolha o que precisa</span><h2>Produtos</h2></div>
+    <button onclick="showProducts()">Ver todos</button>
+  </div>
+
+  <div id="featured" class="products-grid"></div>
+  <div id="homeMessage" class="state-card" hidden></div>
+</section>
+
+<section id="productsView" class="view">
+  <div class="page-head">
+    <button class="back" onclick="goHome()">‹</button>
+    <div><span>Samuel Frutas</span><h2 id="productsTitle">Frutas</h2></div>
+    <button class="mini-cart" onclick="openCart()">🛍️ <b id="pageCartCount">0</b></button>
+  </div>
+  <div class="search-box">
+    <span>⌕</span>
+    <input id="productSearch" type="search" placeholder="Buscar produtos..." oninput="searchProducts(this.value)">
+  </div>
+  <div id="productList" class="products-list"></div>
+</section>
+
+<section id="cartView" class="view">
+  <div class="page-head">
+    <button class="back" onclick="showProducts()">‹</button>
+    <div><span>Seu pedido</span><h2>Minha sacola</h2></div>
+  </div>
+  <div id="cartList"></div>
+  <div id="cartActions" class="cart-actions" hidden>
+    <div><span>Itens na sacola</span><strong id="cartSummary">0 itens</strong></div>
+    <button class="primary" onclick="openCheckout()">Continuar pedido</button>
+  </div>
+</section>
+
+<section id="checkoutView" class="view">
+  <div class="page-head">
+    <button class="back" onclick="openCart()">‹</button>
+    <div><span>Última etapa</span><h2>Finalizar pedido</h2></div>
+  </div>
+
+  <div class="form-card">
+    <label>Como você quer receber?</label>
+    <div class="choice-grid">
+      <button id="deliveryChoice" class="choice selected" onclick="setOrderType('Entrega')"><span>🚚</span><strong>Entrega</strong><small>Receber no endereço</small></button>
+      <button id="pickupChoice" class="choice" onclick="setOrderType('Retirada')"><span>🏪</span><strong>Retirada</strong><small>Buscar no local</small></button>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <label for="deliveryDate">Data do pedido</label>
+    <input id="deliveryDate" type="date">
+  </div>
+
+  <div id="addressCard" class="form-card">
+    <label for="address">Endereço da entrega</label>
+    <input id="address" placeholder="Rua, número, bairro...">
+    <small class="field-help">Prédio / Bloco / Apartamento</small>
+  </div>
+
+  <div class="form-card">
+    <label for="generalObs">Observação geral <span>opcional</span></label>
+    <textarea id="generalObs" maxlength="300" placeholder="Alguma preferência ou informação para o pedido?"></textarea>
+  </div>
+
+  <div class="whatsapp-note">💬 Seu pedido será aberto no WhatsApp já preenchido para você enviar.</div>
+  <button class="primary whatsapp" onclick="finishOrder()">Finalizar pedido <span>→</span><small>Enviar pelo WhatsApp</small></button>
+</section>
+</main>
+
+<nav class="bottom-nav">
+  <button class="active" onclick="goHome()">⌂<span>Início</span></button>
+  <button onclick="showProducts()">▦<span>Produtos</span></button>
+  <button onclick="openCart()">🛍️<span>Sacola</span><i id="navBadge">0</i></button>
+</nav>
+<script type="module" src="preview.js"></script>
+</body>
+</html>

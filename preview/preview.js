@@ -158,6 +158,7 @@ function renderCategories() {
   const categoryMarkup = Object.keys(products).map(key => {
     const meta = CATEGORY_META[key];
     return '<button class="category-option ' + (currentCategory === key ? "active" : "") + '" data-panel-category="' + key + '" type="button">' +
+      (key === "legumes" ? '<img class="category-photo" src="./assets/categoria-legumes.jpg?v=1" alt="" aria-hidden="true">' : '') +
       '<span>' + meta[1] + '</span><div><b>' + meta[0] + '</b><small>' + products[key].length + " item(ns)</small></div></button>";
   }).join("");
 
@@ -166,6 +167,7 @@ function renderCategories() {
   $("cats").innerHTML = Object.keys(products).map(key => {
     const meta = CATEGORY_META[key];
     return '<button class="cat ' + (currentCategory === key ? "active" : "") + '" data-category="' + key + '" type="button">' +
+      (key === "legumes" ? '<img class="category-photo" src="./assets/categoria-legumes.jpg?v=1" alt="" aria-hidden="true">' : '') +
       '<span>' + meta[1] + '</span><b>' + meta[0] + '</b><small>' + products[key].length + " item(ns)</small></button>";
   }).join("");
 

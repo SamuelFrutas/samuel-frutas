@@ -808,3 +808,15 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   font-weight:900 !important;
   line-height:1 !important;
 }
+
+/* UNIDADES — tamanho intermediário */
+.units .unit{
+  min-height:38px !important;
+  min-width:60px !important;
+  padding:0 10px !important;
+  border-width:1.5px !important;
+  border-radius:9px !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+}
+.units{gap:6px !important}

@@ -81,3 +81,30 @@
   .quantity-btn{width:40px!important;min-width:40px!important;height:38px!important;min-height:38px!important;font-size:23px!important}
   .quantity-input{height:38px!important}
 }
+
+/* Correção definitiva: o controle precisa caber dentro do cartão mobile */
+.product{overflow:hidden}
+.quantity-control{
+  width:100%!important;
+  max-width:100%!important;
+  grid-template-columns:34px minmax(0,1fr) 34px!important;
+  gap:4px!important;
+  padding:4px!important;
+}
+.quantity-btn{
+  width:34px!important;
+  min-width:34px!important;
+  height:36px!important;
+  min-height:36px!important;
+  flex:none!important;
+}
+.quantity-input{
+  width:100%!important;
+  min-width:0!important;
+  height:36px!important;
+}
+@media(min-width:700px){
+  .quantity-control{grid-template-columns:42px minmax(0,1fr) 42px!important;gap:5px!important}
+  .quantity-btn{width:42px!important;min-width:42px!important;height:40px!important;min-height:40px!important}
+  .quantity-input{height:40px!important}
+}

@@ -472,7 +472,6 @@ function toast(message) {
 
 function saveAddressData() {
   const data = {
-    address: $("address").value.trim(),
     building: $("building").value.trim(),
     block: $("block").value.trim(),
     apartment: $("apartment").value.trim()
@@ -484,7 +483,6 @@ function loadAddressData() {
   try {
     const data = JSON.parse(localStorage.getItem(ADDRESS_STORAGE_KEY) || "null");
     if (!data) return;
-    $("address").value = data.address || "";
     $("building").value = data.building || "";
     $("block").value = data.block || "";
     $("apartment").value = data.apartment || "";
@@ -502,7 +500,6 @@ function onlyNumbersInput(input) {
 function sendOrder() {
   const items = Object.values(cart);
   const date = $("date").value;
-  const address = $("address").value.trim();
   const building = $("building").value.trim();
   const block = $("block").value.trim();
   const apartment = $("apartment").value.trim();
@@ -510,7 +507,6 @@ function sendOrder() {
   if (!items.length) return toast("Sua sacola está vazia.");
   if (!date) return toast("Escolha a data.");
   if (orderType === "Entrega") {
-    if (!address) return toast("Informe o endereço.");
     if (!building) return toast("Informe o número do prédio.");
     if (!apartment) return toast("Informe o número do apartamento.");
     saveAddressData();

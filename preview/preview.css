@@ -656,3 +656,19 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   color:#fff !important;
   text-shadow:0 2px 5px rgba(0,0,0,.95) !important;
 }
+
+
+/* VERDURAS — mesmo padrão comprovado usado em Frutas e Legumes */
+#cats .cat:nth-child(3){
+  background-image:url('./assets/categoria-verduras.jpg?v=2') !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+}
+#category-panel-list .category-option:nth-child(3){
+  background-image:url('./assets/categoria-verduras.jpg?v=2') !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+}
+#category-panel-list .category-option:nth-child(3)::before{display:none !important}

@@ -445,7 +445,7 @@ function loadAddressData() {
 
 function onlyNumbersInput(input) {
   input.addEventListener("input", () => {
-    input.value = input.value.replace(/\\D/g, "");
+    input.value = input.value.replace(/\D/g, "");
   });
 }
 

@@ -425,3 +425,14 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 #category-panel-list .category-option b{color:var(--ink) !important;text-shadow:none !important}
 #category-panel-list .category-option small{color:var(--muted) !important;text-shadow:none !important}
 #category-panel-list .category-option.active{background:var(--mint) !important;border:2px solid var(--green) !important}
+
+
+/* POSIÇÃO FINAL CONFIRMADA: foto de Frutas somente no card principal da faixa das 4 categorias */
+#cats .cat:nth-child(1){
+  background-image:url("./assets/categoria-frutas.jpg") !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+}
+/* O painel aberto pelo botão Categorias continua somente com emojis. */
+#category-panel-list .category-option{background-image:none !important;background-color:#fff !important}

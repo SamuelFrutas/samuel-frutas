@@ -202,7 +202,7 @@ function renderProduct(product) {
     '<div class="photo">' + image + '<button class="heart" type="button" aria-label="Favorito">♡</button></div>' +
     '<h3>' + escapeHtml(product.name) + '</h3>' +
     (hasMultipleUnits ? '<p class="unit-hint">⚠️ SELECIONE A UNIDADE DE MEDIDA</p>' : '') +
-    '<div class="units">'
+    '<div class="units">' +
       product.units.map(option =>
         '<button class="unit ' + (option === unit ? "active" : "") + '" data-id="' + escapeHtml(product.id) + '" data-unit="' + escapeHtml(option) + '" type="button">' +
           escapeHtml(option) + '</button>'

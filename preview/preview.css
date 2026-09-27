@@ -623,3 +623,36 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   background-position:center !important;
   background-repeat:no-repeat !important;
 }
+
+
+/* IMAGEM APROVADA — VERDURAS, nos 4 cards principais e no painel Categorias */
+#cats .cat:nth-child(3){
+  background-image:url('./assets/categoria-verduras.jpg?v=1') !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  background-color:#173b27 !important;
+}
+#category-panel-list .category-option:nth-child(3){
+  background-image:url('./assets/categoria-verduras.jpg?v=1') !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  background-color:#173b27 !important;
+}
+#category-panel-list .category-option:nth-child(3)::before{
+  display:block !important;
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  background:linear-gradient(180deg,rgba(0,0,0,.02) 20%,rgba(0,0,0,.78) 100%) !important;
+  pointer-events:none !important;
+}
+#category-panel-list .category-option:nth-child(3) span{display:none !important}
+#category-panel-list .category-option:nth-child(3) b,
+#category-panel-list .category-option:nth-child(3) small{
+  position:relative !important;
+  z-index:2 !important;
+  color:#fff !important;
+  text-shadow:0 2px 5px rgba(0,0,0,.95) !important;
+}

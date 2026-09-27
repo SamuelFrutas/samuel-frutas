@@ -159,7 +159,7 @@ function renderCategories() {
     const meta = CATEGORY_META[key];
     return '<button class="category-option ' + (currentCategory === key ? "active" : "") + '" data-panel-category="' + key + '" type="button">' +
       
-      '<span>' + meta[1] + '</span><div><b>' + meta[0] + '</b><small>' + products[key].length + " item(ns)</small></div></button>";
+      '<div><b>' + meta[0] + '</b></div></button>';
   }).join("");
 
   $("category-panel-list").innerHTML = categoryMarkup;

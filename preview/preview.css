@@ -790,3 +790,21 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   .floating-search{bottom:82px}
   .floating-search-box{bottom:76px}
 }
+
+/* UNIDADES — botões maiores para toque no celular */
+.units{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  width:100% !important;
+}
+.units .unit{
+  min-height:44px !important;
+  min-width:72px !important;
+  padding:0 14px !important;
+  border-width:2px !important;
+  border-radius:11px !important;
+  font-size:14px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+}

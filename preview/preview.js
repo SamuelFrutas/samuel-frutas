@@ -1,4 +1,4 @@
-import { db } from "./firebase.js";
+import { db } from "../firebase.js";
 import { collection,getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 const WHATSAPP_NUMBER="5521972837869";
 let products=[];let cart=[];let category="frutas";let orderType="Entrega";

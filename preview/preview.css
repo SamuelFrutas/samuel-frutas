@@ -375,8 +375,13 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 }
 
 /* Fotos aprovadas — quatro categorias principais */
-#cats .cat{background-image:none !important;background-size:cover !important;background-position:center !important;background-repeat:no-repeat !important;}
-#cats .cat:nth-child(1){background-image:url("./assets/categoria-frutas-nova.jpg") !important}
-#cats .cat:nth-child(2){background-image:url("./assets/categoria-legumes-nova.jpg") !important}
-#cats .cat:nth-child(3){background-image:url("./assets/categoria-verduras-nova.jpg") !important}
-#cats .cat:nth-child(4){background-image:url("./assets/categoria-ovos-coco-mel-nova.jpg") !important}
+#cats .cat,
+#category-panel-list .category-option{
+  background-image:url("./assets/categorias-aprovadas.jpg") !important;
+  background-size:200% 200% !important;
+  background-repeat:no-repeat !important;
+}
+#cats .cat:nth-child(1),#category-panel-list .category-option:nth-child(1){background-position:0% 0% !important}
+#cats .cat:nth-child(2),#category-panel-list .category-option:nth-child(2){background-position:100% 0% !important}
+#cats .cat:nth-child(3),#category-panel-list .category-option:nth-child(3){background-position:0% 100% !important}
+#cats .cat:nth-child(4),#category-panel-list .category-option:nth-child(4){background-position:100% 100% !important}

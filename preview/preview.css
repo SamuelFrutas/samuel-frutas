@@ -541,3 +541,71 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 #category-panel-list .category-option:nth-child(2) span{
   display:none !important;
 }
+
+/* CORREÇÃO FINAL — containers relativos para a foto real de Legumes */
+#cats .cat{
+  position:relative !important;
+  overflow:hidden !important;
+}
+#cats .cat:nth-child(2){
+  background-image:none !important;
+  background-color:#173b27 !important;
+}
+#cats .cat .category-photo{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center center !important;
+  margin:0 !important;
+  pointer-events:none !important;
+  border-radius:inherit !important;
+}
+#cats .cat::before{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1 !important;
+  pointer-events:none !important;
+}
+#cats .cat span,
+#cats .cat b,
+#cats .cat small{
+  position:relative !important;
+  z-index:2 !important;
+}
+
+#category-panel-list .category-option{
+  position:relative !important;
+  overflow:hidden !important;
+}
+#category-panel-list .category-option:nth-child(2){
+  background-image:none !important;
+  background-color:#173b27 !important;
+}
+#category-panel-list .category-option .category-photo{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center center !important;
+  margin:0 !important;
+  pointer-events:none !important;
+  border-radius:inherit !important;
+}
+#category-panel-list .category-option::before{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1 !important;
+  pointer-events:none !important;
+}
+#category-panel-list .category-option span,
+#category-panel-list .category-option div{
+  position:relative !important;
+  z-index:2 !important;
+}

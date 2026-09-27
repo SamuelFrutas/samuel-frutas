@@ -173,3 +173,74 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   #cats .cat b{font-size:12px !important}
   #cats .cat small{font-size:8px !important}
 }
+
+/* Refinamento visual do painel Categorias */
+.category-sheet.show .category-panel{
+  padding:20px 16px calc(22px + env(safe-area-inset-bottom)) !important;
+  border-radius:26px 26px 0 0 !important;
+  background:#fff !important;
+  box-shadow:0 -18px 55px rgba(0,0,0,.20) !important;
+}
+.category-panel-head{
+  margin-bottom:16px !important;
+  padding:0 2px !important;
+}
+.category-panel-head small{
+  font-size:9px !important;
+  letter-spacing:1.4px !important;
+  color:#6d7b74 !important;
+}
+.category-panel-head h3{
+  font-size:21px !important;
+  margin-top:4px !important;
+  letter-spacing:-.3px;
+}
+.category-panel-head button{
+  width:38px !important;
+  height:38px !important;
+  background:#edf5f0 !important;
+  font-size:23px !important;
+}
+.category-panel-list{
+  grid-template-columns:1fr 1fr !important;
+  gap:11px !important;
+}
+#category-panel-list .category-option{
+  min-height:112px !important;
+  height:112px !important;
+  padding:12px !important;
+  border:2px solid rgba(255,255,255,.9) !important;
+  border-radius:18px !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  justify-content:flex-start !important;
+  background-size:auto 200% !important;
+  box-shadow:0 5px 16px rgba(16,54,34,.12) !important;
+}
+#category-panel-list .category-option::before{
+  background:linear-gradient(180deg,rgba(0,0,0,.02) 20%,rgba(0,0,0,.82) 100%) !important;
+}
+#category-panel-list .category-option b{
+  font-size:13px !important;
+  font-weight:900 !important;
+  line-height:1.08 !important;
+  text-shadow:0 1px 4px rgba(0,0,0,.8);
+}
+#category-panel-list .category-option small{
+  font-size:8px !important;
+  color:rgba(255,255,255,.88) !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.8);
+}
+#category-panel-list .category-option.active{
+  border:3px solid #fff !important;
+  box-shadow:0 0 0 2px #168447,0 7px 18px rgba(16,54,34,.18) !important;
+}
+.category-shade{
+  background:rgba(5,25,15,.50) !important;
+  backdrop-filter:blur(2px);
+}
+@media(max-width:380px){
+  .category-sheet.show .category-panel{padding-left:12px !important;padding-right:12px !important}
+  #category-panel-list .category-option{height:102px !important;min-height:102px !important;border-radius:16px !important}
+  #category-panel-list .category-option b{font-size:12px !important}
+}

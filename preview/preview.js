@@ -173,6 +173,7 @@ function renderCategories() {
     button.onclick = () => {
       currentCategory = button.dataset.panelCategory;
       closeCategorySheet();
+      openCatalog();
       renderCategories();
       renderProducts();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -323,7 +324,6 @@ function updateCart() {
   $("count").textContent = count;
   $("navcount").textContent = count;
   $("floatcount").textContent = count;
-  $("floating-checkout").style.display = count ? "flex" : "none";
   renderCart();
   renderProducts();
 }
@@ -430,9 +430,16 @@ function setOrderType(type) {
   $("addressbox").hidden = type !== "Entrega";
 }
 
+function updateFloatingButtons() {
+  const inCart = $("cart").classList.contains("on");
+  $("floating-checkout").style.display = inCart ? "none" : (Object.keys(cart).length ? "flex" : "none");
+  $("floating-search").style.display = inCart ? "none" : "block";
+}
+
 function openCart() {
   $("catalog").classList.remove("on");
   $("cart").classList.add("on");
+  updateFloatingButtons();
   window.scrollTo(0, 0);
   renderCart();
 }
@@ -451,6 +458,7 @@ function closeCategorySheet() {
 function openCatalog() {
   $("cart").classList.remove("on");
   $("catalog").classList.add("on");
+  updateFloatingButtons();
   window.scrollTo(0, 0);
 }
 
@@ -596,6 +604,7 @@ function setup() {
   loadAddressData();
   setOrderType("Entrega");
   updateCart();
+  updateFloatingButtons();
   loadProducts();
 }
 

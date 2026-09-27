@@ -396,3 +396,32 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 #category-panel-list .category-option:nth-child(2){background-position:96.1% 2.6% !important}
 #category-panel-list .category-option:nth-child(3){background-position:3.3% 71.4% !important}
 #category-panel-list .category-option:nth-child(4){background-position:96.1% 71.4% !important}
+
+
+/* REGRA FINAL: o painel inferior "Categorias" usa somente emojis. As fotos ficam apenas nos 4 cards da tela principal. */
+#category-panel-list .category-option{
+  background-image:none !important;
+  background-color:#fff !important;
+  background-size:auto !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  color:var(--ink) !important;
+  text-shadow:none !important;
+}
+#category-panel-list .category-option::before{display:none !important}
+#category-panel-list .category-option span{
+  display:grid !important;
+  position:relative !important;
+  z-index:1 !important;
+  flex:0 0 48px !important;
+  width:48px !important;
+  height:48px !important;
+  border-radius:14px !important;
+  background:#f0f7f3 !important;
+  color:initial !important;
+  font-size:26px !important;
+  text-shadow:none !important;
+}
+#category-panel-list .category-option b{color:var(--ink) !important;text-shadow:none !important}
+#category-panel-list .category-option small{color:var(--muted) !important;text-shadow:none !important}
+#category-panel-list .category-option.active{background:var(--mint) !important;border:2px solid var(--green) !important}

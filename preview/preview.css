@@ -41,3 +41,23 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 #toast{position:fixed;left:50%;bottom:82px;z-index:60;transform:translate(-50%,15px);opacity:0;pointer-events:none;background:#173022;color:#fff;padding:10px 14px;border-radius:11px;font-size:11px;transition:.2s}#toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:380px){main{padding-left:10px;padding-right:10px}.grid{gap:7px}.product{padding:8px;border-radius:17px}.photo{height:112px}.quantity-control{height:47px;gap:4px;padding:4px}.quantity-btn{flex-basis:34px;width:34px;min-width:34px;height:37px;min-height:37px;font-size:22px}.quantity-input{height:37px;font-size:12px}.hero{padding:20px;border-radius:23px}.hero-orb{font-size:58px}.hero h1{font-size:25px}}
 @media(min-width:700px){main{padding-top:24px}.hero{min-height:220px;padding:34px}.grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.product{padding:12px}.photo{height:165px}.quantity-control{height:52px;gap:5px}.quantity-btn{flex-basis:42px;width:42px;min-width:42px;height:40px;min-height:40px}.quantity-input{height:40px}.bottom{display:none}}
+
+/* Informativo de alteração de quantidade */
+.edit-hint{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  margin-top:6px;
+  padding:5px 8px;
+  border-radius:7px;
+  background:#fff0f0;
+  color:#c62828;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.15px;
+  line-height:1.2;
+}
+.address-mini input{
+  min-width:0;
+}

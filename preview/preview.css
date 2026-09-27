@@ -717,3 +717,16 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
   background-repeat:no-repeat !important;
 }
 #category-panel-list .category-option:nth-child(4)::before{display:none !important}
+
+
+/* PAINEL CATEGORIAS — somente o nome, sem emoji/contador, sempre branco */
+#category-panel-list .category-option div{
+  position:relative !important;
+  z-index:2 !important;
+}
+#category-panel-list .category-option b{
+  color:#fff !important;
+  font-size:15px !important;
+  font-weight:900 !important;
+  text-shadow:0 2px 5px rgba(0,0,0,.9) !important;
+}

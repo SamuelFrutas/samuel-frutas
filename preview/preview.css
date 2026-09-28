@@ -811,3 +811,6 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 
 /* UNIDADES — tamanho um pouco menor */
 .units .unit{min-height:35px !important;min-width:56px !important;padding:0 9px !important;font-size:11.5px !important;border-radius:8px !important}.units{gap:5px !important}
+
+/* SACOLA — nome e quantidade um pouco maiores */
+.itemtitle b{font-size:16px !important}.itemqty{font-size:15px !important;font-weight:900 !important}

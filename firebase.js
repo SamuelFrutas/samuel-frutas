@@ -39,8 +39,14 @@ function adaptarDadosProduto(data) {
     if (u.maco === true || data?.maco === true || data?.maço === true) unidades.push("MAÇO");
     if (u.duzia === true || data?.duzia === true || data?.dúzia === true) unidades.push("DÚZIA");
     if (u.lote === true || data?.lote === true) {
-        const qtd = parseInt(u.quantidadePorLote || data?.quantidadeLote || 3, 10);
-        unidades.push(qtd > 0 ? `LOTE C/${qtd}` : "LOTE");
+        const qtd = parseInt(u.quantidadePorLote || data?.quantidadeLote || data?.loteQuantity || data?.lote_quantidade || data?.quantidadePorLote || 0, 10);
+        if (qtd > 0) {
+            unidades.push(`LOTE C/${qtd}`);
+            // Mantém a quantidade real para o conversor de unidades da loja.
+            resultado.quantidadeLote = qtd;
+        } else {
+            unidades.push("LOTE");
+        }
     }
     if (temForma("bdj", "bdj", "bandeja")) unidades.push("BDJ");
     if (temForma("umQuarto", "1/4", "¼", "um quarto")) unidades.push("1/4");
@@ -212,7 +218,7 @@ function instalarBloqueioDatas(){
     new MutationObserver(procurar).observe(document.documentElement,{childList:true,subtree:true});
 }
 document.addEventListener("DOMContentLoaded",instalarBloqueioDatas);
-if(document.readyState!=="loading")instalarBloqueioDatas();
+if (document.readyState !== "loading") instalarBloqueioDatas();
 
 /* =========================================================
    SACOLA FLUTUANTE — OCULTAR SOMENTE DENTRO DA SACOLA

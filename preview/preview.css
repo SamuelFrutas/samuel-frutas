@@ -831,3 +831,6 @@ main{width:min(100%,960px);margin:auto;padding:15px 15px 30px}.view{display:none
 .hero{min-height:0 !important;aspect-ratio:auto !important;padding:0 !important;overflow:hidden !important;background:none !important;border-radius:28px !important}
 .hero-image{display:block !important;width:100% !important;height:auto !important;max-width:1200px !important;margin:0 auto !important;object-fit:contain !important;image-rendering:auto !important}
 .hero>div:first-child,.hero-orb{display:none !important}
+
+/* CORREÇÃO DE NITIDEZ: a imagem disponível tem 600 px de largura; não ampliar além do tamanho nativo */
+.hero-image{display:block !important;width:100% !important;height:auto !important;max-width:600px !important;margin:0 auto !important;object-fit:contain !important;image-rendering:auto !important}

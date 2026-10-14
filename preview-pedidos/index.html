@@ -2,17 +2,32 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Samuel Frutas — Pedidos</title>
+<meta name="theme-color" content="#0d8b4c"><title>Samuel Frutas — Fazer pedido</title>
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<header class="top"><div><div class="brand">Samuel Frutas</div><div class="sub">Faça seu pedido</div></div><button id="cartBtn" class="cart">🛒 <span id="cartCount">0</span></button></header>
+<header class="top">
+  <div><div class="brand">Samuel Frutas</div><div class="sub">Faça seu pedido</div></div>
+  <a class="schedule" href="https://samuelfrutas.github.io/samuel-frutas/index.html">📅 Outro dia</a>
+  <button id="cartBtn" class="cart" type="button">🛒 <span id="cartCount">0</span></button>
+</header>
 <main>
-<section class="hero"><span class="pill">🍎 Hortifruti</span><h1>Escolha seus produtos</h1><p>Selecione a unidade de medida antes de adicionar ao pedido.</p></section>
-<div class="tools"><input id="search" type="search" placeholder="🔎 Buscar produto..."><div id="categories" class="chips"></div></div>
-<section id="products" class="grid"></section>
+  <section class="hero"><span class="pill">🍎 Hortifruti</span><h1>Escolha seus produtos</h1><p>Escolha a unidade, ajuste a quantidade e monte sua sacola.</p></section>
+  <div class="tools"><input id="search" type="search" placeholder="🔎 Buscar produto..." aria-label="Buscar produto"><div id="categories" class="chips"></div></div>
+  <section id="products" class="grid" aria-live="polite">Carregando produtos...</section>
 </main>
-<aside id="cart" class="drawer" aria-hidden="true"><div class="drawerHead"><div><strong>Seu pedido</strong><small id="cartSubtitle">0 itens</small></div><button id="closeCart">✕</button></div><div id="cartItems" class="cartItems"></div><div class="checkout"><div class="row"><span>Subtotal</span><strong id="subtotal">R$ 0,00</strong></div><div class="row"><span>Entrega</span><strong id="delivery">R$ 5,00</strong></div><div class="row total"><span>Total</span><strong id="total">R$ 5,00</strong></div><button id="finish" class="primary">Finalizar pedido no WhatsApp</button></div></aside>
+<aside id="cart" class="drawer" aria-hidden="true">
+  <div class="drawerHead"><div><strong>Seu pedido</strong><small id="cartSubtitle">0 itens</small></div><button id="closeCart" type="button" aria-label="Fechar">✕</button></div>
+  <div id="cartItems" class="cartItems"></div>
+  <div class="checkout">
+    <div class="row"><span>Subtotal</span><strong id="subtotal">R$ 0,00</strong></div>
+    <div class="row"><span>Taxa de entrega</span><strong id="delivery">R$ 5,00</strong></div>
+    <div class="row total"><span>Total</span><strong id="total">R$ 0,00</strong></div>
+    <p class="confirm-note">O valor final será confirmado pelo Samuel.</p>
+    <button id="finish" class="primary" type="button">Finalizar pedido no WhatsApp</button>
+  </div>
+</aside>
 <div id="overlay" class="overlay"></div>
+<div id="obsModal" class="modal" aria-hidden="true"><div class="obsBox"><div class="drawerHead"><div><strong>Observação</strong><small id="obsProductName">Para este produto</small></div><button id="obsClose" type="button">✕</button></div><textarea id="obsInput" maxlength="300" placeholder="Ex.: escolher mais maduro, sem muito verde..."></textarea><div class="obsActions"><button id="obsCancel" type="button">Cancelar</button><button id="obsSave" class="primary" type="button">Salvar observação</button></div></div></div>
 <script type="module" src="./app.js"></script>
 </body></html>

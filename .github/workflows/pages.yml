@@ -32,6 +32,6 @@ jobs:
         with:
           path: .
 
-      - name: Publicar
+      - name: Publicar versão atual do main
         id: deployment
         uses: actions/deploy-pages@v4

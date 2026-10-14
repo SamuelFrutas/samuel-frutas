@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Samuel Frutas — Pedidos</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="top"><div><div class="brand">Samuel Frutas</div><div class="sub">Faça seu pedido</div></div><button id="cartBtn" class="cart">🛒 <span id="cartCount">0</span></button></header>
+<main>
+<section class="hero"><span class="pill">🍎 Hortifruti</span><h1>Escolha seus produtos</h1><p>Selecione a unidade de medida antes de adicionar ao pedido.</p></section>
+<div class="tools"><input id="search" type="search" placeholder="🔎 Buscar produto..."><div id="categories" class="chips"></div></div>
+<section id="products" class="grid"></section>
+</main>
+<aside id="cart" class="drawer" aria-hidden="true"><div class="drawerHead"><div><strong>Seu pedido</strong><small id="cartSubtitle">0 itens</small></div><button id="closeCart">✕</button></div><div id="cartItems" class="cartItems"></div><div class="checkout"><div class="row"><span>Subtotal</span><strong id="subtotal">R$ 0,00</strong></div><div class="row"><span>Entrega</span><strong id="delivery">R$ 5,00</strong></div><div class="row total"><span>Total</span><strong id="total">R$ 5,00</strong></div><button id="finish" class="primary">Finalizar pedido no WhatsApp</button></div></aside>
+<div id="overlay" class="overlay"></div>
+<script type="module" src="./app.js"></script>
+</body></html>

@@ -2,57 +2,76 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#071b14">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1f7a45">
   <title>Samuel Frutas — Fazer pedido</title>
-  <link rel="stylesheet" href="./style.css?v=46">
+  <link rel="stylesheet" href="./style.css?v=47">
 </head>
 <body>
   <header class="top">
-    <div class="brandBlock">
-      <div class="brand">🍎 <span>Samuel <b>Frutas</b></span></div>
-      <div class="sub">Qualidade direto pra sua mesa</div>
+    <div class="topInner">
+      <a class="brand" href="#inicio" aria-label="Samuel Frutas">
+        <span class="brandMark">🍎</span>
+        <span><b>Samuel</b> Frutas</span>
+      </a>
+      <div class="headerActions">
+        <a class="schedule" href="https://samuelfrutas.github.io/samuel-frutas/index.html" aria-label="Fazer pedido para outro dia">📅 <span>Outro dia</span></a>
+        <button id="cartBtn" class="cart" type="button" aria-label="Abrir sacola">🛍️<span id="cartCount">0</span></button>
+      </div>
     </div>
-    <div class="topSearch">
-      <input id="search" type="search" placeholder="Buscar frutas, coco, ovos, mel..." aria-label="Buscar produto">
-    </div>
-    <a class="schedule" href="https://samuelfrutas.github.io/samuel-frutas/index.html">📅 <span>Outro dia</span></a>
-    <button id="cartBtn" class="cart" type="button">🛒 <span id="cartCount">0</span></button>
   </header>
 
-  <main>
+  <main id="inicio">
     <section class="hero">
-      <div class="heroText">
-        <span class="pill">🍍 Samuel Frutas</span>
-        <h1>Frutas frescas todos os dias</h1>
-        <p>Escolha seus produtos, selecione a unidade, defina a quantidade e envie seu pedido pelo WhatsApp.</p>
+      <div class="heroCopy">
+        <span class="heroTag">🍍 PEDIDO ONLINE</span>
+        <h1>Qualidade e frescor<br>sempre perto de você.</h1>
+        <p>Escolha suas frutas e envie seu pedido de forma rápida pelo WhatsApp.</p>
       </div>
-      <div class="heroBadges">
-        <span>✓ Produtos selecionados</span>
-        <span>✓ Qualidade</span>
-        <span>✓ Pedido pelo WhatsApp</span>
+      <div class="heroFruit" aria-hidden="true">🍊<span>🍎</span>🥭</div>
+    </section>
+
+    <section class="searchArea" id="buscar">
+      <div class="searchBox">
+        <span>⌕</span>
+        <input id="search" type="search" placeholder="Buscar produto..." aria-label="Buscar produto">
       </div>
     </section>
 
-    <section class="storeHead">
+    <nav class="categories" aria-label="Categorias">
+      <button class="category active" type="button">🍎 <span>Frutas</span></button>
+      <button class="category" type="button">🥥 <span>Água de coco</span></button>
+      <button class="category" type="button">🥚 <span>Ovos</span></button>
+      <button class="category" type="button">🍯 <span>Mel</span></button>
+    </nav>
+
+    <section class="sectionHead">
       <div>
-        <h2>Nossos produtos</h2>
-        <p>Frutas, água de coco, ovos caipiras e mel.</p>
+        <span class="eyebrow">ESCOLHA SEUS PRODUTOS</span>
+        <h2>Produtos fresquinhos</h2>
       </div>
+      <span class="countLabel">Samuel Frutas</span>
     </section>
 
     <section id="products" class="grid" aria-live="polite">Carregando produtos...</section>
   </main>
 
   <button id="floatingCart" class="floatingCart" type="button" aria-label="Abrir sacola">
-    <span class="floatIcon">🛒</span>
+    <span class="floatIcon">🛍️</span>
     <span class="floatText"><b>Sua sacola</b><small id="floatingCartTotal">R$ 0,00</small></span>
     <span id="floatingCartCount" class="floatCount">0</span>
   </button>
 
+  <nav class="bottomNav" aria-label="Navegação">
+    <a class="bottomItem active" href="#inicio">⌂<small>Início</small></a>
+    <a class="bottomItem" href="#categorias" onclick="document.querySelector('.categories')?.scrollIntoView({behavior:'smooth'})">▦<small>Categorias</small></a>
+    <a class="bottomItem" href="#buscar" onclick="setTimeout(()=>document.getElementById('search')?.focus(),200)">⌕<small>Buscar</small></a>
+    <button class="bottomItem" type="button" onclick="document.getElementById('floatingCart')?.click()">🛍️<small>Sacola</small></button>
+  </nav>
+
   <aside id="cart" class="drawer" aria-hidden="true">
     <div class="drawerHead">
-      <div><strong>🛒 Sua sacola</strong><small id="cartSubtitle">0 itens</small></div>
+      <div><strong>🛍️ Sua sacola</strong><small id="cartSubtitle">0 itens</small></div>
       <button id="closeCart" type="button" aria-label="Fechar">✕</button>
     </div>
     <div id="cartItems" class="cartItems"></div>
@@ -61,7 +80,7 @@
       <div class="row"><span>Taxa de entrega</span><strong id="delivery">R$ 0,00</strong></div>
       <div class="row total"><span>Total</span><strong id="total">R$ 0,00</strong></div>
       <p class="confirm-note">O valor final é uma estimativa. Samuel confirma os detalhes no WhatsApp.</p>
-      <button id="finish" class="primary" type="button">🟢 Finalizar no WhatsApp</button>
+      <button id="finish" class="primary" type="button">💬 Finalizar pedido no WhatsApp</button>
     </div>
   </aside>
 
@@ -70,8 +89,8 @@
   <div id="obsModal" class="modal" aria-hidden="true">
     <div class="obsBox">
       <div class="drawerHead">
-        <div><strong>Observação do pedido</strong><small id="obsProductName">Para este produto</small></div>
-        <button id="obsClose" type="button">✕</button>
+        <div><strong>Observação do produto</strong><small id="obsProductName">Para este produto</small></div>
+        <button id="obsClose" type="button" aria-label="Fechar">✕</button>
       </div>
       <textarea id="obsInput" maxlength="300" placeholder="Ex.: escolher mais maduro, por favor..."></textarea>
       <div class="obsActions">
@@ -81,6 +100,6 @@
     </div>
   </div>
 
-  <script type="module" src="./app.js?v=45"></script>
+  <script type="module" src="./app.js?v=46"></script>
 </body>
 </html>
